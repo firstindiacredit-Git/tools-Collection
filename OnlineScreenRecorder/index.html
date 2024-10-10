@@ -1,0 +1,260 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+ 
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+ <title>Screen Recorder </title>
+<meta name="description" content="Screen recorder. Screen capture. Screencast free online downloader app.">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+<style>
+   h1 { font-size:1.6rem; }
+   h2 { font-size:1.4rem; }
+   h4 { font-size:1.2rem; }
+   #myform {
+      max-width:600px;
+      padding:20px;
+      background:#ffffff;
+      border:1px solid #ffffff;
+      border-radius:7px;
+      width: 600px;
+   }
+   #myform .btn span { vertical-align: middle; }
+   #myform #openfile { display:none; }
+   #myform #recordbtn { padding:1rem; }
+   /*#myform #savebtn,#myform #savebtn span { color:white; }*/
+   #myform #browserwarndiv { display:none; }
+   #video {
+      border: 1px solid #ffffff;
+      width: 100%;
+      max-width: 860px;
+   }
+   .error { color: red; }
+   .warn { color: orange; }
+   .info { color: darkgreen; }
+
+  html body{
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+ 
+   }
+</style>
+ </head>
+<body>
+<div id="header">
+<div>
+  
+</div>
+<div id="wrapper">
+<div id="nav">
+ </div>
+<div id="lcol">
+<div id="doc">
+
+<h1>Screen Recorder</h1>
+<form id="myform">
+<div id="browserwarndiv" class="alert alert-warning alert-dismissible fade show" role="alert">
+Your browser does not support screen recording.
+Open this page with latest version of Chrome, Firefox or Safari desktop browser!
+<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+<span aria-hidden="true">&times;</span>
+</button>
+</div>
+<div class="form-check mb-3">
+<input class="form-check-input" type="checkbox" value id="screenvideo" checked disabled>
+<label class="form-check-label" for="screenvideo">
+Record video from screen
+</label>
+</div>
+<div class="form-check mb-3">
+<input class="form-check-input" type="checkbox" value id="screenaudio" checked>
+<label class="form-check-label" for="screenaudio">
+Record audio from screen
+</label>
+</div>
+<div class="mb-3 d-grid">
+<button type="button" id="recordbtn" title="Record" class="btn btn-block btn-success btn-lg"><img src="icons8-record-30.png" loading="lazy" width="24" height="24" alt> Record</button>
+</div>
+<div class="mb-3 d-grid">
+<button type="button" id="stopbtn" title="Stop" class="btn btn-block btn-secondary btn-lg"><img src="icons8-stop-50.png" loading="lazy" width="24" height="24" alt> Stop</button>
+</div>
+<video id="video" controls autoplay></video>
+<div class="mb-3 mt-3">
+<label for="filename" class="form-label">Enter file name</label>
+<input type="text" id="filename" placeholder="screen-record" class="form-control">
+</div>
+<div class="row ms-0 me-0 mt-3">
+<button type="button" id="savebtn" title="Save to Downloads folder" class="btn btn-success btn-lg disabled col me-3"><img src="icons8-save-50 (1).png" loading="lazy" width="24" height="24" alt> Save</button>
+<button type="button" id="sharebtn" title="Share" class="btn btn-lg btn-success disabled col"><img src="icons8-share-50 (2).png" loading="lazy" width="24" height="24" alt> Share</button>
+</div>
+</form>
+ <div id="adngin-bottom_01-0"></div>
+</div>
+<div id="rcol">
+</div>
+</div>
+<script>
+      const filetype1Elem = document.getElementById("filetype1");
+      const filetype2Elem = document.getElementById("filetype2");
+      const fileElem = document.getElementById("openfile");
+      const videoElem = document.getElementById("video");
+      const startElem = document.getElementById("recordbtn");
+      const stopElem = document.getElementById("stopbtn");
+      const saveElem = document.getElementById("savebtn");
+      const shareElem = document.getElementById("sharebtn");
+      const screenVideoCheck = document.getElementById("screenvideo");
+      const screenAudioCheck = document.getElementById("screenaudio");
+      const micAudioCheck = document.getElementById("micaudio");
+      const browserWarnDiv = document.getElementById("browserwarndiv");
+      var recordedChunks = [];
+       
+      startElem.addEventListener("click", function(evt) {
+         startCapture();
+      }, false);
+      stopElem.addEventListener("click", function(evt) {
+         stopCapture();
+      }, false);
+      saveElem.addEventListener("click", function(evt) {
+         save();
+      }, false);
+      shareElem.addEventListener("click", function(evt) {
+         share();
+      }, false);
+     
+      checkBrowser();
+  
+   function checkBrowser() {
+      var os=GetOS();
+      if( os=="iOS" || os=="Android" )
+         browserWarnDiv.style.display="block";
+      if( typeof navigator.mediaDevices !== "object" ||
+          typeof navigator.mediaDevices.getDisplayMedia !== "function" )
+         browserWarnDiv.style.display="block";
+   }
+   function onfiletype(t) {
+      if( t==1 ) {
+         
+         filetype1Elem.setAttribute("checked", "");
+         filetype2Elem.removeAttribute("checked");
+         filetype1Elem.parentElement.classList.add("active");
+         filetype2Elem.parentElement.classList.remove("active");
+      }
+      else {
+    
+         filetype1Elem.removeAttribute("checked");
+         filetype2Elem.setAttribute("checked", "");
+         filetype1Elem.parentElement.classList.remove("active");
+         filetype2Elem.parentElement.classList.add("active");
+      }
+   }
+   function onOpenFile(obj) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+         videoElem.src = e.target.result;
+         videoElem.type = "video/webm";
+         videoElem.pause();
+         videoElem.currentTime = 0;
+      };
+      reader.readAsDataURL(obj.files[0]);
+   }
+   async function startCapture() {
+      startElem.classList.remove("btn-success");
+      startElem.classList.add("btn-danger");
+      var isScreenAudio=screenAudioCheck.checked;
+      //var isMicAudio=micAudioCheck.checked;
+      const displayMediaOptions = {
+         video: true,
+         audio: isScreenAudio
+      };
+      let stream = null;
+      try {
+        
+         stream = await navigator.mediaDevices.getDisplayMedia(displayMediaOptions);
+         stream.getVideoTracks()[0].onended = function() {
+            stopCapture();
+         };
+        
+         videoElem.srcObject = stream;
+         videoElem.autoplay = true;
+         videoElem.muted = true;
+
+         recordedChunks = [];
+         //var options = { mimeType: "video/webm; codecs=vp9,vp8,opus" };
+         var options = { mimeType: "video/webm; codecs=vp8" };
+         mediaRecorder = new MediaRecorder(stream, options);
+         mediaRecorder.ondataavailable = handleDataAvailable;
+         mediaRecorder.start();
+      }
+      catch(err) {
+         console.log("Error: " + err);
+      }
+   }
+   function handleDataAvailable(event) {
+      console.log("data-available");
+      if (event.data.size > 0) {
+          recordedChunks=[event.data];
+       
+         var blob = new Blob(recordedChunks, { type: "video/webm" });
+         videoElem.src = URL.createObjectURL(blob);
+         videoElem.autoplay=false;
+         videoElem.muted = false;
+      }
+   }
+   function stopCapture() {
+      startElem.classList.remove("btn-danger");
+      startElem.classList.add("btn-success");
+      if( videoElem.srcObject==null ) return;
+      let tracks = videoElem.srcObject.getTracks();
+      tracks.forEach(track => track.stop());
+      videoElem.srcObject = null;
+      saveElem.classList.remove("disabled");
+      shareElem.classList.remove("disabled");
+   }
+ 
+   function save() {
+    
+      if( recordedChunks.length==0 ) return;
+       var clipName = document.getElementById("filename").value;
+      if( clipName=="" ) clipName="screen-record";
+      var blob = new Blob(recordedChunks, {
+         type: "video/webm"
+      });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      document.body.appendChild(a);
+      a.style = "display: none";
+      a.href = url;
+      //a.download = "test.webm";
+      a.download = clipName+".webm";
+      a.click();
+      window.URL.revokeObjectURL(url);
+   }
+   function share()
+   {
+      if( recordedChunks.length==0 ) return;
+      var clipName = document.getElementById("filename").value;
+      if( clipName=="" ) clipName="screen-record";
+      const blob = new Blob(recordedChunks, {type: "video/webm"});
+      const name=clipName+".webm";
+      var file = new File([blob], name, {type: 'video/webm'});
+      var filesArray = [file];
+      var url=window.location;
+      if(navigator.canShare && navigator.canShare({ files: filesArray })){
+         navigator.share({
+            files: filesArray,
+            title: clipName,
+            text: name,
+            url: url
+         })
+         .then(() => console.log('Share was successful.'))
+         .catch((error) => console.log('Sharing failed', error));
+      } else {
+         console.log(`Your system doesn't support sharing files.`);
+      }
+   }
+</script>
+</body>
+</html>

@@ -1,0 +1,443 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<script>
+   var deskAdsNum=0;
+</script>
+<script async src="/lib/tagmng8.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+ 
+<title> Online Voice Recorder</title>
+<meta name="description" content="Voice recorder. Audio/sound/music recorder online app from microphone.">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+<style>
+   h1 { font-size:1.6rem; }
+   h2 { font-size:1.4rem; }
+   h4 { font-size:1.2rem; }
+   #wrapper a { line-height:unset; }
+   #rcol a { line-height:2; }
+   #myform {
+      max-width:600px;
+      padding:20px;
+      background:#ffffff;
+      border:1px solid #ffffff;
+      border-radius:7px;
+      touch-action: manipulation;
+   }
+   #myform .btn span { vertical-align: middle; }
+   #myform #recordbtn { padding:1rem; }
+   #myform #savebtn,#myform #savebtn span { color:white; text-decoration:none; }
+   #myform audio { width:100%; }
+   #myform #micwarn { display:none; }
+   .visualizer { width:100%; height:60px; background:#ccc; border:1px #aaa solid; }
+ 
+
+</style>
+
+</head>
+<body>
+<div id="header">
+<div>
+ 
+ 
+</div>
+</div>
+<div id="wrapper">
+<div id="nav">
+
+ 
+</div>
+<div id="lcol">
+<div id="doc">
+
+<h1>Voice Recorder</h1>
+<p>Record audio from microphone :</p>
+<form id="myform" class="mb-3">
+<div class="mb-3 d-grid">
+<button type="button" id="recordbtn" title="Record" class="btn btn-danger btn-lg"><img src="icons8-record-30.png" loading="lazy" width="24" height="24" alt> Record</button>
+</div>
+<div id="micwarn" class="mb-3 alert alert-warning alert-dismissible fade show" role="alert">
+Please allow microphone access by clicking the camera icon in the browser's address bar.
+<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+<span aria-hidden="true">&times;</span>
+</button>
+</div>
+<div id="btngroup1" class="mb-3 row ms-0 me-0" role="group" aria-label="Toolbar">
+<button type="button" id="pausebtn" title="Pause" class="btn btn-secondary btn-lg col me-1"><img src="icons8-pause-50.png" loading="lazy" width="24" height="24" alt> Pause</button>
+<button type="button" id="stopbtn" title="Stop" class="btn btn-secondary btn-lg col"><img src="icons8-stop-50.png" loading="lazy" width="24" height="24" alt> Stop</button>
+</div>
+<div class="mb-3 mt-4">
+<canvas class="visualizer" height="60"></canvas>
+</div>
+<div class="mb-3 form-row sound-clips mt-4">
+
+<audio id="player" controls></audio>
+</div>
+<div class="mb-3 input-group">
+<input type="text" id="fname" placeholder="filename" class="form-control">
+
+<input type="radio" class="btn-check" name="ftype" id="ftype1" checked>
+<label class="btn btn-outline-secondary" for="ftype1">WebM</label>
+<input type="radio" class="btn-check" name="ftype" id="ftype2">
+<label class="btn btn-outline-secondary" for="ftype2">WAV</label>
+
+</div>
+
+<div class="row ms-0 me-0">
+<a id="savebtn" title="Save to downloads folder" class="btn btn-success btn-lg disabled col me-1"><img src="icons8-save-50 (1).png" loading="lazy" width="24" height="24" alt> Save</a>
+<button id="sharebtn" type="button" title="Share" class="btn btn-success btn-lg disabled col"><img src="icons8-share-50 (2).png" loading="lazy" width="24" height="24" alt> Share</button>
+</div>
+</form>
+ 
+
+</div>
+ 
+</div>
+ 
+</div>
+ 
+ 
+
+
+<script >function get_browser()
+{s=GetBrowser();s=s.split(' ');return s[0];}
+function get_version()
+{s=GetBrowser();s=s.split(' ');return s[1];}
+function GetBrowser()
+{var ua=navigator.userAgent,tem,M=ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i)||[];if(/trident/i.test(M[1])){tem=/\brv[ :]+(\d+)/g.exec(ua)||[];return 'MSIE '+(tem[1]||'');}
+if(M[1]==='Chrome'){tem=ua.match(/\bOPR\/(\d+)/)
+if(tem!=null)return 'Opera '+tem[1];}
+M=M[2]?[M[1],M[2]]:[navigator.appName,navigator.appVersion,'-?'];if((tem=ua.match(/version\/(\d+)/i))!=null)M.splice(1,1,tem[1]);return M.join(' ');}
+function GetOS0()
+{var OSName="unknown";if(navigator.appVersion.indexOf("Win")!=-1)OSName="Windows";if(navigator.appVersion.indexOf("X11")!=-1)OSName="UNIX";if(navigator.appVersion.indexOf("Linux")!=-1)OSName="Linux";if(navigator.appVersion.indexOf("Mac")!=-1)OSName="MacOS";if(navigator.userAgent.match(/Android/i))OSName="Android";if(navigator.userAgent.match(/iPhone|iPad|iPod/i))OSName="iOS";return OSName;}
+function GetOS()
+{var OSName="unknown";if(navigator.userAgent.indexOf("Win")!=-1)OSName="Windows";if(navigator.userAgent.indexOf("Mac")!=-1)OSName="MacOS";if(navigator.userAgent.indexOf("Linux")!=-1)OSName="Linux";if(navigator.userAgent.indexOf("Android")!=-1)OSName="Android";if(navigator.userAgent.indexOf("like Mac")!=-1)OSName="iOS";if(navigator.userAgent.indexOf("X11")!=-1)OSName="UNIX";return OSName;}
+function GetFileName(file)
+{i0=file.lastIndexOf('/');i1=file.lastIndexOf('\\');if(i0>i1)i1=i0;i1++;i2=file.lastIndexOf('.');name=file.substring(i1,i2)||file;return name;}
+function GetFileExt(file)
+{var ext=file.substring(file.lastIndexOf('.'));return ext;}
+function ShortBtn()
+{var x,y,s;x=$(window).width()-400;y=20;$("#short_div").popup("open",{arrow:true,x:x,y:y});var browser=get_browser();var os=GetOS();if(os=="iOS")
+{s="Add to home screen:\n";s+="<ol>";s+="<li>Click the Share button&nbsp&nbsp<img src=\"/lib/icons/glyphicons_all/glyphicons_halflings/glyphicons_halflings_065_share.png\">.</li>";s+="<li>Select <b>Add to Home Screen</b>.</li>";s+="</ol>";}
+else if(os=="Android")
+{s="Add to home screen:\n";s+="<ol>";s+="<li>Click the Settings button&nbsp&nbsp<img src=\"/lib/icons/glyphicons_all/glyphicons_halflings/glyphicons_halflings_011_3dot.png\">.</li>";s+="<li>Click the Star button&nbsp&nbsp<img src=\"/lib/icons/glyphicons_all/glyphicons_halflings/glyphicons_halflings_006_star-empty.png\">.</li>";s+="<li>Select <b>Add shortcut to home screen</b>.</li>";s+="</ol>";}
+else if(browser=='Chrome')
+{s="Add to taskbar:\n";s+="<ol>";s+="<li>Click the Chrome menu <img src=\"//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/images/icons-png/bars-black.png\">.</li>";s+="<li>Click <b>More Tools</b>.</li>";s+="<li>Add the page:<ul>";s+="<li>Windows: Click <b>Add to taskbar</b>.</li>";s+="<li>Linux: Click <b>Add to desktop</b>.</li>";s+="</ul></li>";s+="<li>Check <b>Open as window</b>.</li>";s+="</ol>";}
+else if(browser=='Firefox')
+{s="Add to desktop:\n";s+="Drag the address bar icon <img src=\"/lib/icons/glyphicons_all/glyphicons_halflings/glyphicons_halflings_134_globe.png\"> to the desktop.";}
+$("#short_div").html(s);}</script>
+<script>!function(e,t){"object"==typeof exports&&"undefined"!=typeof module?t():"function"==typeof define&&define.amd?define(t):t()}(0,function(){"use strict";function e(e){var t=this.constructor;return this.then(function(n){return t.resolve(e()).then(function(){return n})},function(n){return t.resolve(e()).then(function(){return t.reject(n)})})}function t(e){return new this(function(t,n){function o(e,n){if(n&&("object"==typeof n||"function"==typeof n)){var f=n.then;if("function"==typeof f)return void f.call(n,function(t){o(e,t)},function(n){r[e]={status:"rejected",reason:n},0==--i&&t(r)})}r[e]={status:"fulfilled",value:n},0==--i&&t(r)}if(!e||"undefined"==typeof e.length)return n(new TypeError(typeof e+" "+e+" is not iterable(cannot read property Symbol(Symbol.iterator))"));var r=Array.prototype.slice.call(e);if(0===r.length)return t([]);for(var i=r.length,f=0;r.length>f;f++)o(f,r[f])})}function n(e){return!(!e||"undefined"==typeof e.length)}function o(){}function r(e){if(!(this instanceof r))throw new TypeError("Promises must be constructed via new");if("function"!=typeof e)throw new TypeError("not a function");this._state=0,this._handled=!1,this._value=undefined,this._deferreds=[],l(e,this)}function i(e,t){for(;3===e._state;)e=e._value;0!==e._state?(e._handled=!0,r._immediateFn(function(){var n=1===e._state?t.onFulfilled:t.onRejected;if(null!==n){var o;try{o=n(e._value)}catch(r){return void u(t.promise,r)}f(t.promise,o)}else(1===e._state?f:u)(t.promise,e._value)})):e._deferreds.push(t)}function f(e,t){try{if(t===e)throw new TypeError("A promise cannot be resolved with itself.");if(t&&("object"==typeof t||"function"==typeof t)){var n=t.then;if(t instanceof r)return e._state=3,e._value=t,void c(e);if("function"==typeof n)return void l(function(e,t){return function(){e.apply(t,arguments)}}(n,t),e)}e._state=1,e._value=t,c(e)}catch(o){u(e,o)}}function u(e,t){e._state=2,e._value=t,c(e)}function c(e){2===e._state&&0===e._deferreds.length&&r._immediateFn(function(){e._handled||r._unhandledRejectionFn(e._value)});for(var t=0,n=e._deferreds.length;n>t;t++)i(e,e._deferreds[t]);e._deferreds=null}function l(e,t){var n=!1;try{e(function(e){n||(n=!0,f(t,e))},function(e){n||(n=!0,u(t,e))})}catch(o){if(n)return;n=!0,u(t,o)}}var a=setTimeout;r.prototype["catch"]=function(e){return this.then(null,e)},r.prototype.then=function(e,t){var n=new this.constructor(o);return i(this,new function(e,t,n){this.onFulfilled="function"==typeof e?e:null,this.onRejected="function"==typeof t?t:null,this.promise=n}(e,t,n)),n},r.prototype["finally"]=e,r.all=function(e){return new r(function(t,o){function r(e,n){try{if(n&&("object"==typeof n||"function"==typeof n)){var u=n.then;if("function"==typeof u)return void u.call(n,function(t){r(e,t)},o)}i[e]=n,0==--f&&t(i)}catch(c){o(c)}}if(!n(e))return o(new TypeError("Promise.all accepts an array"));var i=Array.prototype.slice.call(e);if(0===i.length)return t([]);for(var f=i.length,u=0;i.length>u;u++)r(u,i[u])})},r.allSettled=t,r.resolve=function(e){return e&&"object"==typeof e&&e.constructor===r?e:new r(function(t){t(e)})},r.reject=function(e){return new r(function(t,n){n(e)})},r.race=function(e){return new r(function(t,o){if(!n(e))return o(new TypeError("Promise.race accepts an array"));for(var i=0,f=e.length;f>i;i++)r.resolve(e[i]).then(t,o)})},r._immediateFn="function"==typeof setImmediate&&function(e){setImmediate(e)}||function(e){a(e,0)},r._unhandledRejectionFn=function(e){void 0!==console&&console&&console.warn("Possible Unhandled Promise Rejection:",e)};var s=function(){if("undefined"!=typeof self)return self;if("undefined"!=typeof window)return window;if("undefined"!=typeof global)return global;throw Error("unable to locate global object")}();"function"!=typeof s.Promise?s.Promise=r:s.Promise.prototype["finally"]?s.Promise.allSettled||(s.Promise.allSettled=t):s.Promise.prototype["finally"]=e});</script>
+<script type="module">import { AudioContext } from 'https://jspm.dev/standardized-audio-context';</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/webrtc-adapter/9.0.1/adapter.min.js" integrity="sha512-NVplxpmGbQ9r63C108KdM/bKT1mV1K+oUFkhCKwTBuD9LhcABwPoGFoiujBs0lPJQSp6SLNkUBYg9zTliIwdVQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+   var voiceRec;
+   const recordButton = document.getElementById('recordbtn');
+   const pauseButton = document.getElementById('pausebtn');
+   const stopButton = document.getElementById('stopbtn');
+   const filename = document.getElementById('fname');
+   const saveButton = document.getElementById('savebtn');
+   const shareButton = document.getElementById('sharebtn');
+   const audio = document.getElementById('player');
+   const micwarnDiv = document.getElementById('micwarn');
+   const soundClips = document.querySelector('.sound-clips');
+   const canvas = document.querySelector('.visualizer');
+   const canvasCtx = canvas.getContext("2d");
+
+   window.addEventListener("DOMContentLoaded",function() {
+      voiceRec = new VoiceRec();
+   });
+
+   function VoiceRec()
+   {
+      this.isInit=false;
+      this.RecState={
+         STOP:0,
+         RECORD:1,
+         PAUSE:2
+      };
+      this.state=this.RecState.STOP;
+      this.stream=null;
+      this.mediaRecorder=null;
+      this.recordedChunks=null;
+      micwarnDiv.style.display="none";
+      recordButton.addEventListener('click', this.start.bind(this));
+      pauseButton.addEventListener('click', this.pause.bind(this));
+      stopButton.addEventListener('click', this.stop.bind(this));
+      saveButton.addEventListener('click', this.save.bind(this));
+      shareButton.addEventListener('click', this.share.bind(this));
+
+      //this.init();
+   }
+
+   VoiceRec.prototype.init = function()
+   {
+      this.isInit=true;
+      if (MediaRecorder !== undefined) {
+         var types = [
+            //"audio/mp3", 
+            "audio/aac", 
+            //"audio/mpeg", 
+            "audio/ogg;codecs=opus", 
+            "audio/webm;codecs=opus", 
+            "audio/wav",
+            "audio/x-wav",
+            "audio/vnd.wav",
+            "audio/flac", 
+            //"audio/mp4", 
+            "audio/opus", 
+            "audio/wma", 
+            "audio/raw", 
+            "audio/oga", 
+            "audio/ogg", 
+            "audio/ogg;codecs=vorbis",
+            "application/ogg", 
+            "video/ogg", 
+            //"video/h264", 
+            //"video/h265", 
+            //"video/mp4;codecs=avc1.42E01E, mp4a.40.2", 
+            //"video/mp4", 
+            "video/quicktime",
+            "video/webm; codecs=vp8",
+            "video/webm; codecs=vp9",
+            "video/webm; codecs=opus",
+            "video/webm"
+         ];
+
+         var names = document.getElementsByName("formats");
+         for (var i in types) {
+            console.log(types[i]+" "+MediaRecorder.isTypeSupported(types[i]));
+         }
+      }
+      // initpoly()
+      if (navigator.mediaDevices === undefined) {
+         navigator.mediaDevices = {};
+      }
+      if (navigator.mediaDevices.getUserMedia === undefined) {
+         navigator.mediaDevices.getUserMedia = function(constraints) {
+            var getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+            if (!getUserMedia) {
+               return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
+            }
+            return new Promise(function(resolve, reject) {
+               getUserMedia.call(navigator, constraints, resolve, reject);
+            });
+         }
+      }
+   }
+
+   VoiceRec.prototype.start = function()
+   {
+      if( !this.isInit ) this.init();
+      //if( recordButton.classList.contains("btn-danger") ) return;
+      if( this.state==this.RecState.RECORD ) return;
+      this.checkMic();
+      this.recordedChunks = [];
+      //audio.src = null; cause 404 null error
+      //recordButton.classList.remove("btn-success");
+      //recordButton.classList.add("btn-danger");
+
+      const constraints={ audio: true, video: false };
+      /*
+      const constraints={ audio: true, video:{
+         width:320
+         //width: { min: 320, ideal: 1280, max: 1920 },
+         //height: { min: 576, ideal: 720, max: 1080 }
+      } };
+      const constraints = {
+         audio: {
+            echoCancellation: false,
+            noiseSuppression: false,
+            autoGainControl: false
+         }
+      };
+      */
+      //audio.setAttribute('autoplay', '');
+      //audio.setAttribute('muted', '');
+      //audio.setAttribute('playsinline', '');
+      if (navigator.mediaDevices === undefined) {
+         navigator.mediaDevices = {};
+      }
+ 
+      navigator.mediaDevices.getUserMedia(constraints)
+         .then(this.onSuccess.bind(this))
+         .catch((err) => {
+            alert(err.name+" "+err.message);
+         });
+   };
+   VoiceRec.prototype.pause = function()
+   {
+      if( this.state==this.RecState.STOP )
+         return;
+      if( this.state==this.RecState.RECORD )
+      {
+         this.state=this.RecState.PAUSE;
+         this.mediaRecorder.pause();
+         pauseButton.innerHTML="<img src='/lib/icons/material/svg/play_arrow_white_24dp.svg' loading='lazy' width='24' height='24' alt=''> Resume";
+      }
+      else
+      {
+         this.state=this.RecState.RECORD;
+         this.mediaRecorder.resume();
+         pauseButton.innerHTML="<img src='/lib/icons/material/svg/pause_white_24dp.svg' loading='lazy' width='24' height='24' alt=''> Pause";
+      }
+   };
+   VoiceRec.prototype.stop = function()
+   {
+      if( this.state==this.RecState.STOP )
+         return;
+      this.mediaRecorder.stop();
+      saveButton.classList.remove("disabled");
+      shareButton.classList.remove("disabled");
+      pauseButton.innerHTML="<img src='icons8-pause-50.png' loading='lazy' width='24' height='24' alt=''> Pause";
+   };
+
+   VoiceRec.prototype.onSuccess = function(stream)
+   {
+      visualize(stream);
+      this.state=this.RecState.RECORD;
+      this.stream=stream;
+
+      const options = {mimeType: 'audio/webm;codecs=opus'};
+      this.recordedChunks = [];
+      this.mediaRecorder = new MediaRecorder(stream, options);
+      //this.init();
+      this.mediaRecorder.addEventListener('dataavailable', this.ondataavailable.bind(this));
+      this.mediaRecorder.addEventListener('stop', this.onstop.bind(this));
+      this.mediaRecorder.start();
+   };
+   VoiceRec.prototype.ondataavailable = function(e)
+   {
+      if (e.data.size > 0) {
+         this.recordedChunks.push(e.data);
+      }
+   };
+   VoiceRec.prototype.onstop = function()
+   {
+      this.state=this.RecState.STOP;
+      this.stream.getTracks().forEach(track => track.stop());
+      this.stream=null;
+      audio.controls = true;
+      const blob = new Blob(this.recordedChunks, {'type' : 'audio/webm; codecs=opus'});
+      const audioURL = window.URL.createObjectURL(blob);
+      audio.src = audioURL;
+   };
+   VoiceRec.prototype.save = function()
+   {
+      if( this.recordedChunks.length==0 ) return;
+      var clipName=filename.value==""?"filename":filename.value;
+      if(1) {
+         clipName+=".webm";
+         saveButton.href = URL.createObjectURL(new Blob(this.recordedChunks));
+         saveButton.download = clipName;
+      }
+      else {
+         clipName+=".wav";
+         //const sampleRate = this.stream.getAudioTracks()[0].getSettings().sampleRate;
+         var wav = new wavefile.WaveFile();
+         //wav.fromScratch(1, 44100, '32', [0, -2147483, 2147483, 4]);
+         wav.fromScratch(1, 44100, '32', this.recordedChunks);
+        
+         saveButton.href = wav.toDataURI();
+         saveButton.download = clipName;
+      }
+   };
+
+   VoiceRec.prototype.share = function()
+   {
+      const blob = new Blob(this.recordedChunks, {'type' : 'audio/webm; codecs=opus'});
+      const clipName=filename.value==""?"filename":filename.value;
+      const name=clipName+".webm";
+      var file = new File([blob], name, {type: 'audio/webm'});
+      var filesArray = [file];
+      if(navigator.canShare && navigator.canShare({ files: filesArray })){
+         navigator.share({
+            files: filesArray,
+            title: clipName,
+            text: name
+            //url: window.location.href
+         })
+         .then(() => console.log('Share was successful.'))
+         .catch((error) => console.log('Sharing failed', error));
+      } else {
+         console.log(`Your system doesn't support sharing files.`);
+      }
+   };
+
+   VoiceRec.prototype.checkMic = function()
+   {
+		var browser = get_browser();
+      if( browser!='Chrome' )
+         return;
+      try {
+         navigator.permissions.query({name:'microphone'}).then(function(result) {
+            if (result.state == 'granted') {
+
+            } else if (result.state == 'prompt') {
+
+            } else if (result.state == 'denied') {
+               micwarnDiv.style.display="block";
+            }
+            result.onchange = function(e) {
+               if( e.srcElement.state=="denied" )
+                  micwarnDiv.style.display="block";
+               else
+                  micwarnDiv.style.display="none";
+            };
+         });
+      }
+      catch(error) {
+         console.log(error);
+      }
+   };
+
+   function visualize(stream) {
+      var audioCtx=0;
+      if(!audioCtx) {
+         audioCtx = new AudioContext();
+      }
+      const source = audioCtx.createMediaStreamSource(stream);
+      const analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 2048;
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+      source.connect(analyser);
+      //analyser.connect(audioCtx.destination);
+      draw()
+
+      function draw() {
+         const WIDTH = canvas.width
+         const HEIGHT = canvas.height;
+         requestAnimationFrame(draw);
+         analyser.getByteTimeDomainData(dataArray);
+         canvasCtx.fillStyle = 'rgb(200, 200, 200)';
+         canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
+         canvasCtx.lineWidth = 2;
+         canvasCtx.strokeStyle = 'rgb(0, 0, 0)';
+         canvasCtx.beginPath();
+         let sliceWidth = WIDTH * 1.0 / bufferLength;
+         let x = 0;
+         for(let i = 0; i < bufferLength; i++) {
+            let v = dataArray[i] / 128.0;
+            let y = v * HEIGHT/2;
+            if(i === 0) {
+               canvasCtx.moveTo(x, y);
+            } else {
+               canvasCtx.lineTo(x, y);
+            }
+            x += sliceWidth;
+         }
+
+         canvasCtx.lineTo(canvas.width, canvas.height/2);
+         canvasCtx.stroke();
+      }
+   }
+
+</script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,65 @@
+ 
+   h1 { font-size:1.6rem; }
+   h2 { font-size:1.4rem; }
+   h4 { font-size:1.2rem; }
+   #wrapper a { line-height:unset; }
+   #myform {
+      max-width:600px;
+      max-width:100%;
+      padding:20px;
+      background:#ffffff;
+      border:1px solid #ffffff;
+      border-radius:7px;
+   }
+   #myform .btn { text-decoration:none; }
+   #myform .btn span { vertical-align: middle; color:#ffffff; }
+   #myform #openfile { display:none; }
+   #myform #recordbtn { height:64px; padding:1rem; }
+   /*#myform #savebtn { height:58px; }*/
+   #myform #browserwarndiv { display:none; }
+   #myform #fontcolor { width:70px; }
+   #myform input[type=color] { width:70px; }
+   #viewdiv { width:100%; height:auto; }
+   #video {
+      max-height:300px;
+      max-width: 600px;
+      border: 1px solid #fafafa;
+      width: 100%;
+   }
+   #canvas {
+      display:none;
+      border: 1px solid #ffffff;
+      width: 100%;
+      max-width: 860px;
+   }
+   #imgdiv {
+      width:100%;
+   }
+   #img {
+      display:block;
+      border: 1px solid #999;
+      width: 100%;
+      height: auto;
+      max-width: 860px;
+      max-width: 100%;
+   }
+   .cropper-point.point-se { height:5px; width:5px; }
+   .select-icon { border:2px dashed #fff; margin-right:8px; }
+   .error { color: red; }
+   .warn { color: orange; }
+   .info { color: rgb(8, 25, 61); }
+	.key
+	{
+		color:#ffffff;
+		background:#ffffff;
+		padding:6px 12px;
+		margin-left:3px;
+		margin-right:3px;
+		-webkit-border-radius: 5px;
+		-moz-border-radius: 5px;
+		border-radius: 5px;
+	}
+   @media screen and (max-width: 600px) {
+      .key { padding:4px 12px; }
+   }
+ 

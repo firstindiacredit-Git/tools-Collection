@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Webcam Test</title>
+ 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
+        integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+    <link rel="stylesheet" href="index.css">
+
+    <style>body{
+    font-family:  'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    background:#f5f5f5;
+    color:#333;
+    margin:0;
+    padding:0;
+    font-size:1rem;
+    line-height:1.6;
+    display: flex;
+    justify-content: center;
+align-items: center;
+
+}
+   h1 { font-size:1.6rem; }
+   h2 { font-size:1.4rem; }
+   h3 { font-size:1.4rem; }
+   h4 { font-size:1.2rem; }
+   .btn img { filter: invert(1); }
+   #miccan { width:100%; height:60px; background:#ffffff00; border:1px #ffffff solid; }
+   #mform {
+      max-width:600px;
+      padding:20px;
+      background:#fafafa;
+      border:1px solid #eee;
+      border-radius:7px;
+   }
+   #mform .btn span { vertical-align: middle; }
+   #videodiv {
+      overflow:hidden;
+   }
+   #vid {
+      background:#444;
+      z-index:0;
+      margin:0 auto;
+      margin-bottom:-5px;
+      width:100%;
+      -webkit-transform: scaleX(-1);
+      transform: scaleX(-1);
+   }
+   #imgid {
+      display:none;
+      margin:0 auto;
+   }
+   .fullscreen { position:fixed; top:0; left:0; right:0; bottom:0; height:100vh; }
+   #wrapper th { background:unset; font-style:unset; }
+   .alert-warning { display:none; }
+   @media (max-width:800px) {
+      #full { display:none; }
+   }
+   @media (min-width:800px) {
+   }
+ </style>
+</head>
+
+<body>
+    <div id="wrapper">
+        <div id="doc">
+            <h1>Webcam Test</h1>
+            <form id="mform">
+                <div class="form-group">
+                    <label for="camsel">Select camera</label>
+                    <select id="camsel" title="Camera select" class="form-control"></select>
+                </div>
+                <div class="form-group">
+                    <label for="micsel">Select microphone</label>
+                    <select id="micsel" title="Microphone select" class="form-control"></select>
+                </div>
+                <div class="form-group">
+                    <button type="button" id="testbtn" title="Test webcam" class="btn btn-lg btn-block btn-success">Test Webcam</button>
+                </div>
+                <div class="alert alert-warning" role="alert">
+                    Camera/mic permission denied!<br>Enable camera/mic by clicking the video icon on the browser's address bar and press the <i>Test Webcam</i> button or reload page.
+                </div>
+                <div id="videodiv" class="form-group">
+                    <video id="vid" autoplay playsinline></video>
+                    <img id="imgid" src="play-pause.png" alt="Captured image">
+                </div>
+                <div id="bar" class="btn-group">
+                    <button type="button" id="getimgbtn" title="Pause/Play" class="btn btn-secondary">
+                        <img src="play-pause.png" loading="lazy" width="24" height="24" alt>
+                    </button>
+                    <button type="button" id="downimgbtn" title="Save image" class="btn btn-secondary">
+                        <img src="download.png" loading="lazy" width="24" height="24" alt>
+                    </button>
+                    <button type="button" id="full" title="Fullscreen" onclick="fullscreen()" class="btn btn-secondary mr-2">
+                        <img src="expand.png" loading="lazy" width="24" height="24" alt>
+                    </button>
+                </div>
+                <div class="form-group mt-4">
+                    <canvas id="miccan" class="visualizer" height="60"></canvas>
+                </div>
+                
+                <div class="form-group mt-2">
+                    <h4>Camera settings</h4>
+                    <table id="tbl" class="table table-sm bg-white">
+                        <tbody>
+                            <tr><th scope="row">Name</th><td></td></tr>
+                            <tr><th scope="row">Resolution</th><td></td></tr>
+                            <tr><th scope="row">Width</th><td></td></tr>
+                            <tr><th scope="row">Height</th><td></td></tr>
+                            <tr><th scope="row">Aspect ratio</th><td></td></tr>
+                            <tr><th scope="row">Brightness</th><td></td></tr>
+                            <tr><th scope="row">Contrast</th><td></td></tr>
+                            <tr><th scope="row">Facing mode</th><td></td></tr>
+                            <tr><th scope="row">Frame rate</th><td></td></tr>
+                            <tr><th scope="row">Saturation</th><td></td></tr>
+                            <tr><th scope="row">Sharpness</th><td></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="form-group mt-2">
+                    <h4>Microphone settings</h4>
+                    <table id="tbl2" class="table table-sm bg-white">
+                        <tbody>
+                            <tr><th scope="row">Name</th><td></td></tr>
+                            <tr><th scope="row">Auto gain control</th><td></td></tr>
+                            <tr><th scope="row">Channels</th><td></td></tr>
+                            <tr><th scope="row">Echo cancelation</th><td></td></tr>
+                            <tr><th scope="row">Latency</th><td></td></tr>
+                            <tr><th scope="row">Noise suppression</th><td></td></tr>
+                            <tr><th scope="row">Sample rate</th><td></td></tr>
+                            <tr><th scope="row">Sample size</th><td></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    
+    <script  >!(function (e, t) {
+  "object" == typeof exports && "undefined" != typeof module
+    ? t()
+    : "function" == typeof define && define.amd
+    ? define(t)
+    : t();
+})(0, function () {
+  "use strict";
+  function e(e) {
+    var t = this.constructor;
+    return this.then(
+      function (n) {
+        return t.resolve(e()).then(function () {
+          return n;
+        });
+      },
+      function (n) {
+        return t.resolve(e()).then(function () {
+          return t.reject(n);
+        });
+      }
+    );
+  }
+  function t(e) {
+    return new this(function (t, n) {
+      function o(e, n) {
+        if (n && ("object" == typeof n || "function" == typeof n)) {
+          var f = n.then;
+          if ("function" == typeof f)
+            return void f.call(
+              n,
+              function (t) {
+                o(e, t);
+              },
+              function (n) {
+                (r[e] = { status: "rejected", reason: n }), 0 == --i && t(r);
+              }
+            );
+        }
+        (r[e] = { status: "fulfilled", value: n }), 0 == --i && t(r);
+      }
+      if (!e || "undefined" == typeof e.length)
+        return n(
+          new TypeError(
+            typeof e +
+              " " +
+              e +
+              " is not iterable(cannot read property Symbol(Symbol.iterator))"
+          )
+        );
+      var r = Array.prototype.slice.call(e);
+      if (0 === r.length) return t([]);
+      for (var i = r.length, f = 0; r.length > f; f++) o(f, r[f]);
+    });
+  }
+  function n(e) {
+    return !(!e || "undefined" == typeof e.length);
+  }
+  function o() {}
+  function r(e) {
+    if (!(this instanceof r))
+      throw new TypeError("Promises must be constructed via new");
+    if ("function" != typeof e) throw new TypeError("not a function");
+    (this._state = 0),
+      (this._handled = !1),
+      (this._value = undefined),
+      (this._deferreds = []),
+      l(e, this);
+  }
+  function i(e, t) {
+    for (; 3 === e._state; ) e = e._value;
+    0 !== e._state
+      ? ((e._handled = !0),
+        r._immediateFn(function () {
+          var n = 1 === e._state ? t.onFulfilled : t.onRejected;
+          if (null !== n) {
+            var o;
+            try {
+              o = n(e._value);
+            } catch (r) {
+              return void u(t.promise, r);
+            }
+            f(t.promise, o);
+          } else (1 === e._state ? f : u)(t.promise, e._value);
+        }))
+      : e._deferreds.push(t);
+  }
+  function f(e, t) {
+    try {
+      if (t === e)
+        throw new TypeError("A promise cannot be resolved with itself.");
+      if (t && ("object" == typeof t || "function" == typeof t)) {
+        var n = t.then;
+        if (t instanceof r) return (e._state = 3), (e._value = t), void c(e);
+        if ("function" == typeof n)
+          return void l(
+            (function (e, t) {
+              return function () {
+                e.apply(t, arguments);
+              };
+            })(n, t),
+            e
+          );
+      }
+      (e._state = 1), (e._value = t), c(e);
+    } catch (o) {
+      u(e, o);
+    }
+  }
+  function u(e, t) {
+    (e._state = 2), (e._value = t), c(e);
+  }
+  function c(e) {
+    2 === e._state &&
+      0 === e._deferreds.length &&
+      r._immediateFn(function () {
+        e._handled || r._unhandledRejectionFn(e._value);
+      });
+    for (var t = 0, n = e._deferreds.length; n > t; t++) i(e, e._deferreds[t]);
+    e._deferreds = null;
+  }
+  function l(e, t) {
+    var n = !1;
+    try {
+      e(
+        function (e) {
+          n || ((n = !0), f(t, e));
+        },
+        function (e) {
+          n || ((n = !0), u(t, e));
+        }
+      );
+    } catch (o) {
+      if (n) return;
+      (n = !0), u(t, o);
+    }
+  }
+  var a = setTimeout;
+  (r.prototype["catch"] = function (e) {
+    return this.then(null, e);
+  }),
+    (r.prototype.then = function (e, t) {
+      var n = new this.constructor(o);
+      return (
+        i(
+          this,
+          new (function (e, t, n) {
+            (this.onFulfilled = "function" == typeof e ? e : null),
+              (this.onRejected = "function" == typeof t ? t : null),
+              (this.promise = n);
+          })(e, t, n)
+        ),
+        n
+      );
+    }),
+    (r.prototype["finally"] = e),
+    (r.all = function (e) {
+      return new r(function (t, o) {
+        function r(e, n) {
+          try {
+            if (n && ("object" == typeof n || "function" == typeof n)) {
+              var u = n.then;
+              if ("function" == typeof u)
+                return void u.call(
+                  n,
+                  function (t) {
+                    r(e, t);
+                  },
+                  o
+                );
+            }
+            (i[e] = n), 0 == --f && t(i);
+          } catch (c) {
+            o(c);
+          }
+        }
+        if (!n(e)) return o(new TypeError("Promise.all accepts an array"));
+        var i = Array.prototype.slice.call(e);
+        if (0 === i.length) return t([]);
+        for (var f = i.length, u = 0; i.length > u; u++) r(u, i[u]);
+      });
+    }),
+    (r.allSettled = t),
+    (r.resolve = function (e) {
+      return e && "object" == typeof e && e.constructor === r
+        ? e
+        : new r(function (t) {
+            t(e);
+          });
+    }),
+    (r.reject = function (e) {
+      return new r(function (t, n) {
+        n(e);
+      });
+    }),
+    (r.race = function (e) {
+      return new r(function (t, o) {
+        if (!n(e)) return o(new TypeError("Promise.race accepts an array"));
+        for (var i = 0, f = e.length; f > i; i++) r.resolve(e[i]).then(t, o);
+      });
+    }),
+    (r._immediateFn =
+      ("function" == typeof setImmediate &&
+        function (e) {
+          setImmediate(e);
+        }) ||
+      function (e) {
+        a(e, 0);
+      }),
+    (r._unhandledRejectionFn = function (e) {
+      void 0 !== console &&
+        console &&
+        console.warn("Possible Unhandled Promise Rejection:", e);
+    });
+  var s = (function () {
+    if ("undefined" != typeof self) return self;
+    if ("undefined" != typeof window) return window;
+    if ("undefined" != typeof global) return global;
+    throw Error("unable to locate global object");
+  })();
+  "function" != typeof s.Promise
+    ? (s.Promise = r)
+    : s.Promise.prototype["finally"]
+    ? s.Promise.allSettled || (s.Promise.allSettled = t)
+    : (s.Promise.prototype["finally"] = e);
+});
+</script>
+    <script type="module">import { AudioContext } from 'https://jspm.dev/standardized-audio-context';</script>
+    <script  > 
+   "use strict"
+   var isfullscreen=false;
+   var captureState=false;
+   var videoTracks,audioTracks;
+   const alertElem = document.getElementsByClassName("alert")[0];
+   const fullElem = document.getElementById("full");
+   const camsel = document.getElementById("camsel");
+   const micsel = document.getElementById("micsel");
+   const video = document.getElementById("vid");
+   const canvas = document.createElement("canvas");
+   const image = document.getElementById("imgid");
+   const testbtn = document.getElementById("testbtn");
+   const getimgbtn = document.getElementById("getimgbtn");
+   const downimgbtn = document.getElementById("downimgbtn");
+   const bar = document.getElementById("bar");
+   const miccan = document.getElementById('miccan');
+   const miccanCtx = miccan.getContext("2d");
+   window.addEventListener("DOMContentLoaded",function() {
+      alertElem.style.display = "none";
+      videoTracks=audioTracks=null;
+      testbtn.onclick=function() { initVideo(); };
+      getimgbtn.onclick=function() { getImage(); };
+      video.onclick=function() { getImage(); };
+      image.onclick=function() { getImage(); };
+      downimgbtn.onclick=function() { downloadImage(); };
+      const supports = navigator.mediaDevices.getSupportedConstraints();
+      if (!supports['facingMode']) {
+         alert('Browser does not support webcam facingMode!');
+      }
+      initPoly();
+      initCameraMicSelects();
+   });
+   function initPoly()
+   {
+      if (navigator.mediaDevices === undefined) {
+         navigator.mediaDevices = {};
+      }
+      if (navigator.mediaDevices.getUserMedia === undefined) {
+         navigator.mediaDevices.getUserMedia = function(constraints) {
+            var getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+            if (!getUserMedia) {
+               return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
+            }
+            return new Promise(function(resolve, reject) {
+               getUserMedia.call(navigator, constraints, resolve, reject);
+            });
+         }
+      }
+   }
+   function initCameraMicSelects()
+   {
+      
+      if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+         console.log("enumerateDevices() not supported.");
+         camsel.style.display = "none";
+         micsel.style.display = "none";
+         return;
+      }
+
+      navigator.mediaDevices.enumerateDevices()
+      .then(function(devices) {
+         var icam=0,imic=0;
+         devices.forEach(function(device) {
+            console.log(device.kind + ": " + device.label + " id = " + device.deviceId);
+            var opt = document.createElement('option');
+            if( device.kind=="videoinput" ) {
+               //opt.value = i;
+               opt.innerHTML = "Camera #"+(++icam);
+               camsel.appendChild(opt);
+            }
+            else if( device.kind=="audioinput" ) {
+               opt.innerHTML = "Microphone #"+(++imic);
+               micsel.appendChild(opt);
+            }
+            else { 
+            }
+         });
+      })
+      .catch(function(err) {
+         console.log(err.name + ": " + err.message);
+      });
+   }
+   function setCameraInfo()
+   {
+      var i = camsel.selectedIndex;
+      var track = videoTracks[i];
+      var settings = videoTracks[0].getSettings();
+      const tbl = document.getElementById("tbl");
+      var res=((settings.width*settings.height)/1e6).toFixed(2);
+      tbl.rows[0].cells[1].innerHTML = videoTracks[0].label;
+      tbl.rows[1].cells[1].innerHTML = res+" megapixels";
+      tbl.rows[2].cells[1].innerHTML = settings.width+" pixels";
+      tbl.rows[3].cells[1].innerHTML = settings.height+" pixels";
+      tbl.rows[4].cells[1].innerHTML = settings.aspectRatio;
+      tbl.rows[5].cells[1].innerHTML = settings.brightness;
+      tbl.rows[6].cells[1].innerHTML = settings.contrast;
+      tbl.rows[7].cells[1].innerHTML = settings.facingMode;
+      tbl.rows[8].cells[1].innerHTML = settings.frameRate+" frames/second";
+      tbl.rows[9].cells[1].innerHTML = settings.saturation;
+      tbl.rows[10].cells[1].innerHTML = settings.sharpness;
+   }
+   function setMicInfo()
+   {
+      var i = micsel.selectedIndex;
+      var track = audioTracks[i];
+      var settings = audioTracks[0].getSettings();
+      const tbl = document.getElementById("tbl2");
+      tbl.rows[0].cells[1].innerHTML = audioTracks[0].label;
+      tbl.rows[1].cells[1].innerHTML = settings.autoGainControl;
+      tbl.rows[2].cells[1].innerHTML = settings.channelCount;
+      tbl.rows[3].cells[1].innerHTML = settings.echoCancellation;
+      tbl.rows[4].cells[1].innerHTML = settings.latency+" second";
+      tbl.rows[5].cells[1].innerHTML = settings.noiseSuppression;
+      tbl.rows[6].cells[1].innerHTML = settings.sampleRate+" Hz";
+      tbl.rows[7].cells[1].innerHTML = settings.sampleSize+" bits";
+   }
+   function initAudio()
+   {
+   }
+   function initVideo(icam)
+   {
+      stopVideo();
+      //const sleep = ms => new Promise(res => setTimeout(res, ms));
+      var constraints = {
+         //audio: false, 
+         audio: true, 
+         video: {
+            width: { ideal: 4096 },
+            height: { ideal: 2160 },
+            //facingMode: { exact: "user" }
+            facingMode: { ideal: "user" }
+            //facingMode: { ideal: "environment" }
+         } };
+      var icam=camsel.selectedIndex;
+      if( icam==1 ) { constraints.video.facingMode = { exact: "environment" }; }
+      alertElem.style.display = "none";
+      navigator.mediaDevices.getUserMedia(constraints)
+      .then(function(mediaStream) {
+      //.then(async mediaStream => {
+      //.then(function success(mediaStream) {
+         //var video = document.querySelector('video');
+         visualize(mediaStream);
+         video.srcObject = mediaStream;
+         video.onloadedmetadata = function(e) {
+            video.play();
+            //initSize();
+         };
+
+         //await sleep(1000);
+
+         videoTracks = mediaStream.getVideoTracks();
+         audioTracks = mediaStream.getAudioTracks();
+         //initCameraMicSelects();
+         setCameraInfo();
+         setMicInfo();
+         console.log(videoTracks[0]);
+         console.log(videoTracks[0].getSettings());
+         var i=micsel.selectedIndex;
+         console.log(audioTracks[i]);
+         console.log(audioTracks[i].getSettings());
+      })
+      .catch(function(err) {
+         console.log(err.name + ": " + err.message);
+         if( get_browser()=="Chrome" ) {
+            alertElem.style.display = "block";
+         }
+      });
+   }
+   function stopAudio()
+   {
+      audioTracks.forEach(track => track.stop());
+   }
+   function stopVideo()
+   {
+      if( videoTracks==null ) return;
+      videoTracks.forEach(track => track.stop());
+   }
+   function getImage()
+   {
+      if( captureState==false ) {
+         captureState = true;
+         var rect = vid.getBoundingClientRect();
+         canvas.width = rect.width;
+         canvas.height = rect.height;
+         var ctx = canvas.getContext('2d');
+         ctx.setTransform(-1,0,0,1,canvas.width,0);
+         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+         const dataURL = canvas.toDataURL("image/png");
+         image.setAttribute('src', dataURL);
+         stopAudio();
+         stopVideo();
+         video.style.display="none";
+         image.style.display="block";
+         getimgbtn.children[0].src = "/play-pause.png";
+         downimgbtn.disabled=false;
+      }
+      else {
+         captureState = false;
+         initVideo();
+         video.style.display="block";
+         image.style.display="none";
+         getimgbtn.children[0].src="/play-pause.png";
+         downimgbtn.disabled=true;
+      }
+   }
+   function downloadImage()
+   {
+      var a = document.createElement('a');
+      a.download = 'myimage.png';
+      a.href = image.src;
+      a.click();
+   }
+   function fullscreen()
+   {
+      if( !isfullscreen ) {
+         isfullscreen=true;
+         fullElem.children[0].src="/expand.png";
+         image.classList.add("fullscreen");
+         video.classList.add("fullscreen");
+         bar.style.setProperty("bottom","0");
+         bar.style.setProperty("position","fixed");
+         document.body.style.overflow = 'hidden';
+      }
+      else {
+         isfullscreen=false;
+         fullElem.children[0].src="/expand.png";
+         image.classList.remove("fullscreen");
+         video.classList.remove("fullscreen");
+         bar.style.setProperty("bottom","unset");
+         bar.style.setProperty("position","relative");
+         document.body.style.overflow = 'visible';
+      }
+   }
+   function visualize(stream) {
+      var audioCtx=0;
+      if(!audioCtx) {
+         audioCtx = new AudioContext();
+      }
+      const source = audioCtx.createMediaStreamSource(stream);
+      const analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 2048;
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+      source.connect(analyser);
+      analyser.connect(audioCtx.destination);
+      draw()
+
+      function draw() {
+         const WIDTH = miccan.width
+         const HEIGHT = miccan.height;
+         requestAnimationFrame(draw);
+         analyser.getByteTimeDomainData(dataArray);
+         miccanCtx.fillStyle = 'rgb(200, 200, 200)';
+         miccanCtx.fillRect(0, 0, WIDTH, HEIGHT);
+         miccanCtx.lineWidth = 2;
+         miccanCtx.strokeStyle = 'rgb(0, 0, 0)';
+         miccanCtx.beginPath();
+         let sliceWidth = WIDTH * 1.0 / bufferLength;
+         let x = 0;
+         for(let i = 0; i < bufferLength; i++) {
+            let v = dataArray[i] / 128.0;
+            let y = v * HEIGHT/2;
+            if(i === 0) {
+               miccanCtx.moveTo(x, y);
+            } else {
+               miccanCtx.lineTo(x, y);
+            }
+            x += sliceWidth;
+         }
+
+         miccanCtx.lineTo(miccan.width, miccan.height/2);
+         miccanCtx.stroke();
+      }
+    }
+</script>
+</body>
+
+</html>

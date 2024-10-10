@@ -1,0 +1,582 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+ <style> 
+   h1 { font-size:1.6rem; }
+   h2 { font-size:1.4rem; }
+   h4 { font-size:1.2rem; }
+   #wrapper a { line-height:unset; }
+   #myform {
+      max-width:600px;
+      max-width:100%;
+      padding:20px;
+      background:#ffffff;
+      border:1px solid #ffffff;
+      border-radius:7px;
+   }
+   #myform .btn { text-decoration:none; }
+   #myform .btn span { vertical-align: middle; color:#ffffff; }
+   #myform #openfile { display:none; }
+   #myform #recordbtn { height:64px; padding:1rem; }
+   /*#myform #savebtn { height:58px; }*/
+   #myform #browserwarndiv { display:none; }
+   #myform #fontcolor { width:70px; }
+   #myform input[type=color] { width:70px; }
+   #viewdiv { width:100%; height:auto; }
+   #video {
+      max-height:300px;
+      max-width: 600px;
+      border: 1px solid #fafafa;
+      width: 100%;
+   }
+   #canvas {
+      display:none;
+      border: 1px solid #ffffff;
+      width: 100%;
+      max-width: 860px;
+   }
+   #imgdiv {
+      width:100%;
+   }
+   #img {
+      display:block;
+      border: 1px solid #999;
+      width: 100%;
+      height: auto;
+      max-width: 860px;
+      max-width: 100%;
+   }
+   .cropper-point.point-se { height:5px; width:5px; }
+   .select-icon { border:2px dashed #fff; margin-right:8px; }
+   .error { color: red; }
+   .warn { color: orange; }
+   .info { color: rgb(8, 25, 61); }
+	.key
+	{
+		color:#ffffff;
+		background:#ffffff;
+		padding:6px 12px;
+		margin-left:3px;
+		margin-right:3px;
+		-webkit-border-radius: 5px;
+		-moz-border-radius: 5px;
+		border-radius: 5px;
+	}
+   @media screen and (max-width: 600px) {
+      .key { padding:4px 12px; }
+   }
+ 
+</style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" type="text/css" href="/lib/rapid02.css">
+
+
+<title>Screenshot</title>
+<meta name="description" content="Screenshot online free app.">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+<link rel="stylesheet" href="index.css">
+</head>
+<body>
+<div id="header">
+<div>
+</div>
+</div>
+<div id="wrapper">
+<div id="nav">
+</div>
+<div id="lcol">
+<div id="doc">
+
+<h1>Screenshot</h1>
+<form id="myform">
+<div id="browserwarndiv" class="alert alert-warning alert-dismissible fade show" role="alert">
+Your browser does not support screen recording.
+Open this page with latest version of Chrome, Firefox or Safari desktop browser!
+<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+<span aria-hidden="true">&times;</span>
+</button>
+</div>
+<div class="mb-3 d-grid gap-2">
+<button type="button" id="recordbtn" class="btn btn-block btn-success btn-lg" style="background-color: cadetblue;"><img src="screenshot.png" loading="lazy" width="24" height="24" alt> Screenshot</button>
+</div>
+<video id="video" controls></video>
+<div id="viewdiv">
+<canvas id="canvas"></canvas>
+</div>
+<div id="opsel" class="btn-group mt-3" data-toggle="buttons">
+<input type="radio" name="opsel" class="btn-check">
+<label class="btn btn-secondary disabled" onclick="onOpSel(0)"><span class="select-icon">&nbsp;&nbsp;&nbsp;&nbsp;</span> Select</label>
+<input type="radio" name="opsel" class="btn-check">
+<label class="btn btn-secondary disabled" onclick="onOpSel(1)"><img src="/OnlineScreenshot/assets/icons8-draw-50.png" loading="lazy" width="24" height="24" alt> Draw</label>
+<input type="radio" name="opsel" class="btn-check">
+<label class="btn btn-secondary disabled" onclick="onOpSel(2)"><img src="/OnlineScreenshot/assets/icons8-text-50.png" loading="lazy" width="24" height="24" alt> Text</label>
+</div>
+<div id="opseldiv" class="btn-group mt-3" data-toggle="buttons2">
+<button type="button" class="btn btn-secondary" onclick="onOpSel(3)"><img src="/OnlineScreenshot/assets/icons8-fullscreen-30.png" loading="lazy" width="24" height="24" alt> Fullscreen</button>
+</div>
+<div id="selectdiv" class="mt-4">
+<button type="button" id="cropbtn" class="btn btn-block btn-secondary" title="Crop"><img src="/OnlineScreenshot/assets/icons8-crop-30.png" loading="lazy" width="24" height="24" alt> Crop</button>
+</div>
+<div id="drawdiv" class="form-inline mt-4">
+<div class="mb-3">
+<label for="pencolor" class="sr-only">Pen color</label>
+<input type="color" id="pencolor" value="#D81B60" title="Pen color" class="form-control">
+</div>
+<div class="mb-3 ml-3">
+<label for="penwidth" class="sr-only">Pen width</label>
+<input type="number" id="penwidth" min="1" step="1" value="4" title="Pen width" class="form-control">
+</div>
+</div>
+<div id="textdiv" class="mt-4">
+<div class="form-inline">
+<div class="mb-3">
+<label for="underlinebtn" class="sr-only">Font style</label>
+<div class="btn-group">
+<button type="button" id="underlinebtn" title="Underlined" class="btn btn-secondary" data-toggle="button" aria-pressed="false"><img src="/OnlineScreenshot/assets/icons8-underline-50.png" loading="lazy" width="24" height="24" alt></button>
+<button type="button" id="italicbtn" title="Italic" class="btn btn-secondary" data-toggle="button" aria-pressed="false"><img src="/OnlineScreenshot/assets/icons8-italic-50.png" loading="lazy" width="24" height="24" alt></button>
+<button type="button" id="boldbtn" title="Bold" class="btn btn-secondary" data-toggle="button" aria-pressed="false"><img src="/OnlineScreenshot/assets/icons8-bold-50.png" loading="lazy" width="24" height="24" alt></button>
+</div>
+</div>
+<div class="mb-3 ml-3">
+<label for="fontcolor" class="sr-only">Font color</label>
+<input type="color" id="fontcolor" value="#D81B60" title="Font color" class="form-control">
+</div>
+<div class="mb-3">
+<label for="fontsize" class="sr-only">Font size</label>
+<input type="number" id="fontsize" min="8" max="200" step="1" value="70" title="Font size" class="form-control">
+</div>
+<div class="mb-3">
+<label for="fontfamily" class="sr-only">Font family</label>
+<select id="fontfamily" title="Font family" class="form-control">
+<option>Arial</option>
+<option>"Arial Black"</option>
+<option>"Comic Sans MS"</option>
+<option>Courier</option>
+<option>"Courier New"</option>
+<option>cursive</option>
+<option>Gadget</option>
+<option>Geneva</option>
+<option>Georgia</option>
+<option>Helvetica</option>
+<option>Impact</option>
+<option>"Lucida Sans Unicode"</option>
+<option>monospace</option>
+<option>sans-serif</option>
+<option>serif</option>
+<option>Tahoma</option>
+<option>Times</option>
+<option>"Times New Roman"</option>
+<option>Verdana</option>
+</select>
+</div>
+</div>
+<div class="mb-3">
+<button type="button" id="clearbtn" title="Clear selection" class="btn btn-block btn-secondary mt-4"><img src="/OnlineScreenshot/assets/icons8-clear-48.png" loading="lazy" width="24" height="24" alt> Clear selection</button>
+</div>
+</div>
+<div id="savediv" class="mt-4">
+<div class="form-inline">
+<div class="mb-3">
+<label for="filename" class="form-label">Enter image file name & type</label>
+<div class="input-group">
+<input type="text" id="filename" placeholder="screenshot" class="form-control">
+<div class="btn-group" data-toggle="buttons">
+<input type="radio" id="format1" name="formats" class="btn-check" checked>
+<label for="format1" class="btn btn-outline-secondary" onclick="OnFileType(0)">WEBP</label>
+<input type="radio" id="format2" name="formats" class="btn-check">
+<label for="format2" class="btn btn-outline-secondary" onclick="OnFileType(1)">PNG</label>
+
+</div>
+</div>
+</div>
+</div>
+<div class="row ms-0 me-0 mt-3">
+<a id="savebtn" title="Save to Downloads folder" class="btn btn-success btn-lg disabled bg-black col me-3"><img src="/OnlineScreenshot/assets/icons8-save-50.png" loading="lazy" width="24" height="24" alt> Save</a>
+<button id="sharebtn" type="button" title="Share" class="btn btn-success btn-lg disabled col bg-black"><img src="/OnlineScreenshot/assets/icons8-share-50.png" loading="lazy" width="24" height="24" alt> Share</button>
+</div>
+</div>
+</form>
+ 
+
+ 
+
+
+ 
+
+<div id="adngin-adhesive-0"></div>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/3.6.3/fabric.min.js" integrity="sha512-DwbCgiW/2uFJkC4G3dIZmQuEY4aDajSrKaovVFnbVz5+ziJ7fvlWZ2CVEPommhxV8LNB/8uurTxNTzIkkh8PJQ==" crossorigin="anonymous"></script>
+<script src="/lib/utils/utils.js"></script>
+<script  >"use strict";
+const recordbtn = document.getElementById("recordbtn"),
+  videoElem = document.getElementById("video"),
+  canvasElem = document.getElementById("canvas"),
+  viewElem = document.getElementById("viewdiv"),
+  imgElem = document.getElementById("img"),
+  startElem = document.getElementById("recordbtn"),
+  saveElem = document.getElementById("savebtn"),
+  shareElem = document.getElementById("sharebtn"),
+  opSel = document.getElementsByName("opsel"),
+  fmt = document.getElementsByName("fmt"),
+  cropbtn = document.getElementById("cropbtn"),
+  clearbtn = document.getElementById("clearbtn"),
+  penColor = document.getElementById("pencolor"),
+  penWidth = document.getElementById("penwidth"),
+  fontColor = document.getElementById("fontcolor"),
+  fontSize = document.getElementById("fontsize"),
+  fontFamilySel = document.getElementById("fontfamily"),
+  browserWarnDiv = document.getElementById("browserwarndiv"),
+  selectDiv = document.getElementById("selectdiv"),
+  drawDiv = document.getElementById("drawdiv"),
+  textDiv = document.getElementById("textdiv");
+var rectleft,
+  recttop,
+  mediaRecorder,
+  cropwidth,
+  cropheight,
+  fText,
+  fImg,
+  recordedChunks = [],
+  dataAvailableCount = 0,
+  cropper = null,
+  isCaptured = !1,
+  fCanvas = null,
+  dpr = window.devicePixelRatio || 1,
+  previ = null,
+  rect = null,
+  crect = null,
+  mouseDown = null,
+  disabled = !1,
+  frect = {},
+  ftype = 0;
+function checkBrowser() {
+  var e = GetOS();
+  ("iOS" == e || "Android" == e) && (browserWarnDiv.style.display = "block"),
+    ("object" != typeof navigator.mediaDevices ||
+      "function" != typeof navigator.mediaDevices.getDisplayMedia) &&
+      (browserWarnDiv.style.display = "block");
+}
+function setFontStyle() {
+  for (var e = 0; e < fontFamilySel.length; e++)
+    fontFamilySel.options[e].style.fontFamily = fontFamilySel.options[e].text;
+}
+async function startCapture() {
+  0 == previ && closeCrop(),
+    (recordbtn.disabled = !0),
+    (videoElem.style.cursor = "progress"),
+    (videoElem.style.display = "block"),
+    (canvasElem.style.display = "none"),
+    (isCaptured = !1),
+    null != fCanvas && (fCanvas.clear(), fCanvas.dispose()); //!!!???!!!???
+  var e = window.screen.availWidth * dpr,
+    t = window.screen.availHeight * dpr;
+  let n = null;
+  try {
+    ((n = await navigator.mediaDevices.getDisplayMedia({
+      video: {
+        width: { minWidth: e, ideal: e },
+        height: { minHeight: t, ideal: t },
+      },
+      audio: !1,
+    })).getVideoTracks()[0].onended = function () {
+      stopCapture();
+    }),
+      (videoElem.srcObject = n),
+      (videoElem.autoplay = !0),
+      (videoElem.muted = !0),
+      (recordedChunks = []),
+      (dataAvailableCount = 0),
+      ((mediaRecorder = new MediaRecorder(n, {
+        mimeType: "video/webm; codecs=vp8",
+      })).ondataavailable = handleDataAvailable),
+      mediaRecorder.start(100);
+  } catch (a) {
+    console.log("Error: " + a), (recordbtn.disabled = !1);
+  }
+}
+function onClearBtn() {
+  var e = fCanvas.getActiveObjects();
+  fCanvas.discardActiveObject(), fCanvas.remove(...e);
+}
+function handleDataAvailable(e) {
+  if (e.data.size > 0) {
+    if (
+      (recordedChunks.push(e.data),
+      1 == ++dataAvailableCount && stopCapture(),
+      2 == dataAvailableCount)
+    ) {
+      var t = new Blob(recordedChunks, { type: "video/webm" });
+      videoElem.addEventListener("canplaythrough", onCanPlay, { once: !0 }),
+        (videoElem.src = URL.createObjectURL(t)),
+        (videoElem.autoplay = !1),
+        (videoElem.muted = !0);
+    }
+  } else console.log(e.data);
+}
+function stopCapture() {
+  if (null != videoElem.srcObject)
+    videoElem.srcObject.getTracks().forEach((e) => e.stop()),
+      (videoElem.srcObject = null);
+}
+function onCanPlay() {
+  document.hidden
+    ? document.addEventListener(
+        "visibilitychange",
+        function () {
+          document.hidden ||
+            setTimeout(function () {
+              setCanvas();
+            }, 500);
+        },
+        { once: !0 }
+      )
+    : setTimeout(function () {
+        setCanvas();
+      }, 500),
+    saveElem.classList.remove("disabled"),
+    shareElem.classList.remove("disabled");
+}
+function setCanvas() {
+  (canvasElem.width = videoElem.videoWidth),
+    (canvasElem.height = videoElem.videoHeight),
+    canvasElem.getContext("2d").drawImage(videoElem, 0, 0),
+    (isCaptured = !0),
+    (videoElem.style.display = "none"),
+    (canvasElem.style.display = "block"),
+    initFabric(),
+    (recordbtn.disabled = !1);
+  for (
+    var e = document.querySelectorAll("#opsel>label"), t = 0;
+    t < e.length;
+    t++
+  )
+    e[t].classList.remove("disabled");
+  (videoElem.style.cursor = "pointer"), onOpSel();
+}
+function initFabric() {
+  null == crect && (crect = canvasElem.getBoundingClientRect());
+  var e = canvasElem.toDataURL("image/png");
+  (fCanvas = new fabric.Canvas("canvas")).setBackgroundImage(
+    e,
+    fCanvas.renderAll.bind(fCanvas)
+  );
+  var t = fCanvas.width / dpr,
+    n = fCanvas.height / dpr;
+  t > crect.width &&
+    ((n = Math.round((n * crect.width) / t)), (t = Math.round(crect.width))),
+    fCanvas.setWidth(t + "px", { cssOnly: !0 }),
+    fCanvas.setHeight(n + "px", { cssOnly: !0 });
+}
+function onOpSel(e) {
+  (selectDiv.style.display = "none"),
+    (drawDiv.style.display = "none"),
+    (textDiv.style.display = "none"),
+    0 == e && (selectDiv.style.display = "block"),
+    1 == e && (drawDiv.style.display = "block"),
+    2 == e && (textDiv.style.display = "block"),
+    3 == e && FullscreenReq(),
+    !1 == isCaptured
+      ? (videoElem.style.display = "block")
+      : (videoElem.style.display = "none"),
+    null != fCanvas && (2 == e || 3 == e ? selectable() : unselectable()),
+    0 == e ? initCrop() : 0 != e && 0 == previ && closeCrop(),
+    1 == e ? onDraw() : 1 != e && 1 == previ && (fCanvas.isDrawingMode = !1),
+    2 == e
+      ? fCanvas.on("mouse:up", onAddText)
+      : 2 == previ && fCanvas.off("mouse:up", onAddText),
+    (previ = e);
+}
+function selectable() {
+  fCanvas.forEachObject(function (e) {
+    e.selectable = !0;
+  });
+}
+function unselectable() {
+  fCanvas.forEachObject(function (e) {
+    e.selectable = !1;
+  });
+}
+function FullscreenReq() {
+  let e = canvasElem;
+  e.requestFullscreen
+    ? e.requestFullscreen()
+    : e.mozRequestFullScreen
+    ? e.mozRequestFullScreen()
+    : e.webkitRequestFullscreen
+    ? e.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT)
+    : e.msRequestFullscreen && e.msRequestFullscreen();
+}
+function OnFullscreen() {
+  document.fullscreenElement
+    ? ((fullscreen = !0),
+      chartdiv.style.setProperty("width", window.innerWidth + "px"),
+      chartdiv.style.setProperty("height", window.innerHeight + "px"),
+      (xsize = x),
+      (ysize = y),
+      setGraphSize())
+    : ((fullscreen = !1),
+      chartdiv.style.setProperty("width", "100%"),
+      chartdiv.style.setProperty("height", "100%"),
+      (x = xsize),
+      (y = ysize)),
+    drawChart();
+}
+function initCrop() {
+  (rect = new fabric.Rect({
+    fill: "transparent",
+    originX: "left",
+    originY: "top",
+    stroke: "#444",
+    strokeDashArray: [4, 2],
+    strokeWidth: 2,
+    opacity: 1,
+    left: 0,
+    top: 0,
+    width: 1,
+    height: 1,
+    visible: !1,
+  })),
+    fCanvas.add(rect),
+    fCanvas.on("mouse:down", cropMouseDown),
+    fCanvas.on("mouse:move", cropMouseMove),
+    fCanvas.on("mouse:up", cropMouseUp);
+}
+function closeCrop() {
+  fCanvas.remove(rect),
+    fCanvas.off("mouse:down", cropMouseDown),
+    fCanvas.off("mouse:move", cropMouseMove),
+    fCanvas.off("mouse:up", cropMouseUp);
+}
+function cropMouseDown(e) {
+  if (!disabled) {
+    var t = fCanvas.getPointer(e.e);
+    (frect.left = t.x),
+      (frect.top = t.y),
+      (rect.left = t.x),
+      (rect.top = t.y),
+      (rect.visible = !0),
+      (mouseDown = e.e),
+      fCanvas.bringToFront(rect);
+  }
+}
+function cropMouseMove(e) {
+  if (mouseDown && !disabled) {
+    var t = fCanvas.getPointer(e.e),
+      n = t.x - frect.left,
+      a = t.y - frect.top;
+    n < 0 ? ((n = -n), (rect.left = t.x)) : (rect.left = frect.left),
+      a < 0 ? ((a = -a), (rect.top = t.y)) : (rect.top = frect.top),
+      (frect.width = n),
+      (frect.height = a),
+      (rect.width = n),
+      (rect.height = a),
+      fCanvas.renderAll();
+  }
+}
+function cropMouseUp() {
+  (mouseDown = null), (cropbtn.disabled = !1);
+}
+function onCrop() {
+  var e = new Image();
+  (e.onload = function () {
+    fCanvas.clear();
+    var t = new fabric.Image(e);
+    (t.left = 0),
+      (t.top = 0),
+      t.setCoords(),
+      fCanvas.setBackgroundImage(t, fCanvas.renderAll.bind(fCanvas));
+  }),
+    (e.src = fCanvas.toDataURL({
+      left: frect.left,
+      top: frect.top,
+      width: frect.width,
+      height: frect.height,
+    }));
+}
+function onDraw() {
+  (fCanvas.isDrawingMode = !0),
+    (fCanvas.freeDrawingBrush.color = penColor.value),
+    (fCanvas.freeDrawingBrush.width = penWidth.value);
+}
+function onAddText(e) {
+  if (!e.target) {
+    var t = fCanvas.getPointer(event.e),
+      n = document.getElementById("underlinebtn").classList.contains("active"),
+      a = document.getElementById("italicbtn").classList.contains("active")
+        ? "italic"
+        : "normal",
+      l = document.getElementById("boldbtn").classList.contains("active")
+        ? "bold"
+        : "normal",
+      o = new fabric.IText("xxxxxx", {
+        left: t.x,
+        top: t.y,
+        strokeWidth: 2,
+        fill: fontColor.value,
+        stroke: fontColor.value,
+        fontSize: fontSize.value,
+        fontFamily: fontFamilySel.options[fontFamilySel.selectedIndex].value,
+        underline: n,
+        fontStyle: a,
+        fontWeight: l,
+      });
+    fCanvas.add(o);
+  }
+}
+function OnFileType(e) {
+  ftype = e;
+}
+function save() {
+  let e = ["image/webp", "image/png"][ftype],
+    t = [".webp", ".png"][ftype];
+  var n = document.getElementById("filename").value;
+  "" == n && (n = "screenshot");
+  var a = canvas.toDataURL(e, 0.92),
+    l = document.createElement("a");
+  document.body.appendChild(l),
+    (l.style = "display: none"),
+    (l.href = a),
+    (l.download = n + t),
+    l.click(),
+    window.URL.revokeObjectURL(a);
+}
+function share() {
+  let e = ["image/webp", "image/png"][ftype],
+    t = [".webp", ".png"][ftype];
+  canvas.toBlob((n) => {
+    let a = "" == filename.value ? "screenshot" : filename.value,
+      l = a + t;
+    var o = [new File([n], l, { type: e })];
+    navigator.canShare && navigator.canShare({ files: o })
+      ? navigator
+          .share({ files: o, title: a, text: l })
+          .then(() => console.log("Share was successful."))
+          .catch((e) => console.log("Sharing failed", e))
+      : console.log("Your system doesn't support sharing files.");
+  });
+}
+window.onload = function () {
+  (canvasElem.style.display = "none"),
+    (cropbtn.disabled = !0),
+    (selectDiv.style.display = "none"),
+    (drawDiv.style.display = "none"),
+    (textDiv.style.display = "none"),
+    startElem.addEventListener("click", startCapture, !1),
+    clearbtn.addEventListener("click", onClearBtn, !1),
+    cropbtn.addEventListener("click", onCrop, !1),
+    penColor.addEventListener("change", onDraw, !1),
+    penWidth.addEventListener("change", onDraw, !1),
+    saveElem.addEventListener("click", save, !1),
+    shareElem.addEventListener("click", share, !1),
+    checkBrowser(),
+    setFontStyle();
+};
+</script>
+
+</body>
+
+</html>

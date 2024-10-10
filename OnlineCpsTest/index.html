@@ -1,0 +1,201 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<script>var mobileAdsNum=0;</script>
+<script async src="/lib/tagmng8.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" type="text/css" href="/lib/rapid02.css">
+<link rel="apple-touch-icon" sizes="180x180" href="/lib/favicon/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="/lib/favicon/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/lib/favicon/favicon-16x16.png" sizes="16x16">
+<link rel="manifest" href="/lib/favicon/manifest.json">
+<link rel="mask-icon" href="/lib/favicon/safari-pinned-tab.svg" color="#5bbad5">
+<link rel="shortcut icon" href="/lib/favicon/favicon.ico">
+<meta name="msapplication-config" content="/lib/favicon/browserconfig.xml">
+<meta name="theme-color" content="#ffffff">
+<meta name="format-detection" content="telephone=no">
+
+<title>CPS Test - Click Speed Test</title>
+<meta content="CPS test. Clicks per second. Click speed test." name="description">
+
+<link href="/lib/bootstrap/bootstrap4small.css" rel="stylesheet">
+<style>
+   #curve_div { display:none; }
+   .adslot_2 { display:none; height:250px; }
+   h1 { font-size:1.6rem; }
+   h2 { font-size:1.4rem; }
+   #gen { max-width:500px; background:#eee8d5; padding:20px; border-radius:.25rem; touch-action: manipulation; }
+   #gen #addbtn { padding:3rem 1rem; }
+   .btn-outline-success { font-weight:600; }
+   #addbtn { font-size:2rem; }
+   #resetbtn { font-size:1.5rem; }
+   /*#outdiv,#tbldiv { display:none; }*/
+   #tbldiv { display:none; }
+   #cps { font-weight:600; }
+   #gen .btn span { vertical-align:bottom; }
+   #gen .input-group-append { background:#fff; }
+   #curve_div { width:100%; height:100px; border:1px solid #aaa; /*background:#f8f8f8;*/ }
+   #curve_chart { width:100%; height:100px; }
+   .stop-scroll { height:100%; overflow:hidden; }
+   .btn-secondary { color:#fff !important; }
+   #addbtn {
+      position: relative;
+      overflow: hidden;
+      
+      transition: background 400ms;
+      color: #fff;
+      padding: 1rem 2rem;
+      outline: 0;
+      border: 0;
+      border-radius: 0.25rem;
+      box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+      
+   }
+   #addbtn>span.ripple {
+      position: absolute;
+      border-radius: 50%;
+      transform: scale(0);
+      animation: ripple 500ms linear; /*600ms*/
+      background-color: rgba(255, 255, 255, 0.3); /*0.7*/
+   }
+   @keyframes ripple {
+      to {
+         transform: scale(4);
+         opacity: 0;
+      }
+   }
+   #tbl td { background:#fff; text-align: center; }
+@media all and (max-width: 576px) {
+   .btn-group>a>span { display:none; }
+}
+</style>
+
+</head>
+<body>
+<div id="header">
+<div>
+<div id="logo"><a href="/">RapidTables</a></div>
+<div class="gcse-search"></div>
+<div id="tooldiv">
+<a href="#" onclick="OnPageSearch()"><img width="24" height="24" title="Search" src="/lib/icons/material/svg/search_black_24dp.svg" loading="lazy"><span> Search</span></a>
+<a href="#" onclick="OnPageShare()"><img width="24" height="24" title="Share" src="/lib/icons/material/svg/share_black_24dp.svg" loading="lazy"><span> Share</span></a>
+</div>
+</div>
+</div>
+<div id="wrapper">
+<div id="nav">
+
+<a href="/">Home</a>&rsaquo;<a href="index.html">Tools</a>&rsaquo;<a href="click-test.html">Click speed test</a>
+
+</div>
+<div id="lcol">
+<div id="doc">
+
+<h1>CPS Test</h1>
+<p>Click speed test - check clicks per second:</p>
+<form id="gen">
+<div class="form-group btn-group">
+<a href="click-test.html?t=1" class="btn btn-outline-success bold"><span>CPS </span>1 sec</a>
+<a href="click-test.html?t=5" class="btn btn-outline-success"><span>CPS </span>5 sec</a>
+<a href="click-test.html?t=10" class="btn btn-outline-success"><span>CPS </span>10 sec</a>
+<a href="click-test.html?t=15" class="btn btn-outline-success"><span>CPS </span>15 sec</a>
+</div>
+<div class="form-row">
+<div class="form-group col">
+<label for="timer">Test time</label>
+<div class="input-group">
+<input type="number" min="1" max="100" step="1" value="5" id="timer" class="form-control form-control-lg" autofocus>
+<div class="input-group-append">
+<span class="input-group-text">seconds</span>
+</div>
+</div>
+</div>
+<div class="form-group col">
+<label for="count">Clicks</label>
+<input type="number" step="any" value="0" id="count" class="form-control form-control-lg" readonly>
+</div>
+</div>
+<div id="outdiv" class="form-row">
+<div class="form-group col">
+<label for="cps">Clicks per second</label>
+<div class="input-group">
+<input type="text" id="cps" class="form-control form-control-lg" readonly>
+<div class="input-group-append">
+<span class="input-group-text">cps</span>
+</div>
+</div>
+</div>
+<div class="form-group col">
+<label for="cpm">Clicks per minute</label>
+<div class="input-group">
+<input type="text" id="cpm" class="form-control form-control-lg" readonly>
+<div class="input-group-append">
+<span class="input-group-text">cpm</span>
+</div>
+</div>
+</div>
+</div>
+<div id="curve_div" class="form-group">
+<div id="curve_chart"></div>
+</div>
+<div class="form-group">
+<label>Click the + button to start:</label>
+
+<button type="button" id="addbtn" onmouseup="onAdd(event)" oncontextmenu="return false;" class="btn btn-lg w-100 btn-success">+</button>
+</div>
+<div class="form-group mt-4">
+<button type="button" id="resetbtn" title="New test" onclick="onReset()" class="btn w-100 btn-secondary">&times; new test</button>
+</div>
+<div id="tbldiv" class="form-group mt-4">
+<table id="tbl" class="table">
+<caption>Click test results history</caption>
+<thead>
+<tr>
+<th>#</th>
+<th>Test time<br>(seconds)</th>
+<th>Clicks per<br>second (cps)</th>
+</tr>
+</thead>
+<tbody>
+
+</tbody>
+</table>
+<button type="button" title="Clear table" onclick="onTableClear()" class="btn btn-secondary mt-3">&times; Clear Table</button>
+</div>
+
+</form>
+<br>
+<h2>How to use the CPS test</h2>
+<ol>
+<li>Select test time in seconds or press one of the preset buttons.</li>
+<li>Click the <b>+</b> button or spacebar until the test time reaches zero.</li>
+<li>View the clicks per second (CPS) and clicks per minute (CPM) result values.</li>
+<li>Click the <b>&times;</b> button to reset.</li>
+</ol>
+<br>
+<hr>
+<h2>See also</h2>
+ 
+
+</div>
+ 
+ 
+</div>
+</div>
+ 
+ 
+
+
+
+<script>
+"use strict";var params,scrollBarWidth,timeout,tstart,tend,dt,num=0,iskeyup=!0,duration=1,body=document.body,outdiv=document.getElementById("outdiv"),tbldiv=document.getElementById("tbldiv"),timer=document.getElementById("timer"),count=document.getElementById("count"),cpsElem=document.getElementById("cps"),cpmElem=document.getElementById("cpm"),addbtn=document.getElementById("addbtn"),curve_chart=document.getElementById("curve_chart"),cps=[],t=0,xdata=[["Time","Clicks"]],rows=0,results=[];function localLoad(){if("undefined"!=typeof Storage){var e=localStorage.getObject("click-test");if(null!=e){void 0==e.timer?timer.value="1":timer.value=e.timer,results=e.results;for(var l=0;l<results.length;l++)AddRow()}}}function localSave(){if("undefined"!=typeof Storage){var e={timer:duration,results:results};localStorage.setObject("click-test",e)}}function getScrollbarWidth(){let e=document.createElement("div");e.style.visibility="hidden",e.style.overflow="scroll",e.style.msOverflowStyle="scrollbar",document.body.appendChild(e);let l=document.createElement("div");e.appendChild(l);let n=e.offsetWidth-l.offsetWidth;return e.parentNode.removeChild(e),n}function GetURLParams(){for(var e,l=window.location.href,n=/[?&]([^=#]+)=([^&#]*)/g,d={};e=n.exec(l);)d[e[1]]=e[2];return d}function onAdd(e){0==num&&(tstart=Date.now(),timeout=setTimeout(function(){onTime()},1e3),duration=timer.value,timer.disabled=!0,document.body.style.overflow="hidden",document.body.style.paddingRight=scrollBarWidth+"px"),timer.value>0&&(count.value=++num),cps[t]++,createRipple(e)}function AddRow(){var e=document.getElementById("tbl").getElementsByTagName("tbody")[0].insertRow(rows),l=rows+1;e.innerHTML="<tr>         <td>"+l+"</td>         <td>"+results[rows].t+"</td>         <td>"+results[rows].cps+"</td>      </tr>",rows++,tbldiv.style.display="block"}function onTableClear(){document.getElementById("tbl").getElementsByTagName("tbody")[0].innerHTML="",rows=0,results=[]}function onReset(){num=0,t=0,timer.value=duration,void 0!==params.data&&(timer.value=params.t),count.value=0,cpsElem.value="",cpmElem.value="",addbtn.disabled=!1,clearTimeout(timeout),timer.disabled=!1,document.body.style.overflow="visible",document.body.style.paddingRight="0px",xdata=[["Time","Clicks"]];for(var e=0;e<100;e++)cps[e]=0;curve_chart.style.display="none",outdiv.style.display="none"}function onTime(){timer.value>1&&(timeout=setTimeout(function(){onTime()},1e3-(dt=(Date.now()-tstart)%1e3))),timer.value--,t++,cpsElem.value=(count.value/t).toFixed(2),cpmElem.value=(60*count.value/t).toFixed(2),0==timer.value&&(addbtn.disabled=!0,tend=Date.now(),console.log(tend-tstart),document.body.style.overflow="visible",cpsElem.focus(),outdiv.style.display="flex",results[rows]={},results[rows].t=duration,results[rows].cps=cpsElem.value,AddRow())}function createRipple(e){let l=document.createElement("span"),n=Math.max(addbtn.clientWidth,addbtn.clientHeight),d=n/2;l.style.width=l.style.height=`${n}px`,l.style.left=`${e.clientX-(addbtn.offsetLeft+d)}px`,l.style.top=`${e.clientY-(addbtn.getBoundingClientRect().top+d)}px`,l.classList.add("ripple");let i=addbtn.getElementsByClassName("ripple")[0];i&&i.remove(),addbtn.appendChild(l)}window.addEventListener("beforeunload",function(e){localSave()}),window.addEventListener("DOMContentLoaded",function(){if(document.onkeydown=function(e){!0==iskeyup&&("Space"==e.code||32==e.keyCode)&&(e.preventDefault(),iskeyup=!1,onAdd(e))},document.onkeyup=function(e){iskeyup=!0},void 0!==(params=GetURLParams()).t){let e=document.querySelector("#doc>h1");e.innerHTML=params.t+" Seconds CPS Test",document.title=params.t+" Seconds CPS Test",timer.value=params.t}for(var l=0;l<100;l++)cps[l]=0;scrollBarWidth=getScrollbarWidth(),localLoad()}),Storage.prototype.setObject=function(e,l){this.setItem(e,JSON.stringify(l))},Storage.prototype.getObject=function(e){var l=this.getItem(e);return null==l||"undefined"==l?null:l&&JSON.parse(l)};
+</script>
+
+
+</body>
+
+</html>

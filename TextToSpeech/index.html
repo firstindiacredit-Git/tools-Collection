@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="/lib/rapid02.css" />
+    <title>Text to Speech</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
+      integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2"
+      crossorigin="anonymous"
+    />
+    <style>
+      .adslot_2 {
+        height: 0;
+      }
+      h1 {
+        font-size: 1.6rem;
+      }
+      h2 {
+        font-size: 1.4rem;
+      }
+      h3 {
+        font-size: 1.4rem;
+      }
+      h4 {
+        font-size: 1.2rem;
+      }
+      .btn img {
+        filter: invert(1);
+      }
+      #calcform {
+        padding: 15px;
+        background: #eee8d5;
+        border: 1px solid #eee;
+        border-radius: 7px;
+      }
+      .btn i {
+        vertical-align: middle;
+      }
+      #play {
+        width: 80px;
+      }
+      #area::-moz-selection {
+        background: #f8f800;
+        color: #000;
+      }
+      #area::selection {
+        background: #0aa9be;
+        color: #000;
+        border-style: none;
+      }
+      .btn-light {
+        background: #eee8d5;
+        border-color: unset;
+        border-color: #eee8d5;
+      }
+      .btn-light:hover {
+        background: #ded8c5;
+        border-color: unset;
+        border-color: #eee8d5;
+      }
+      /*#topbar,*/
+      #bar,
+      #playslide {
+        width: 100%;
+        background: #6c757d;
+        background: #eee8d5;
+      }
+      #playslide {
+        margin-bottom: 10px; /*padding:0px 1px 15px 1px; margin-top:0px;*/
+      }
+      #bar {
+        margin-top: -5px;
+      }
+      #volbtn:hover ~ #volslide {
+        display: block; /*transition: width 2s;*/
+        width: 80px;
+      }
+      #volslide {
+        width: 80px;
+        padding: 20px 5px !important;
+        display: none;
+        -webkit-transition: width 2s;
+        transition: width 2s;
+      }
+      #volslide:hover {
+        display: block;
+      }
+      #volslide::-webkit-slider-thumb {
+        background: black;
+      }
+      #voiceselect {
+        max-width: 608px;
+        max-width: 100%;
+        width: unset;
+      }
+      .fullscreen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 100vh;
+      }
+
+      #area #area:hover,
+      #area:active,
+      #area:focus {
+        border: 1px solid #ced4da;
+        outline: 0px !important;
+        -webkit-appearance: none;
+        box-shadow: none !important;
+      }
+      @media all and (max-width: 600px) {
+        #topbar button span {
+          display: none;
+        }
+      }
+      @media all and (min-width: 601px) {
+      }
+    </style>
+  </head>
+  <body>
+    <div id="header">
+      <div>
+        <div class="gcse-search"></div>
+        <div id="tooldiv"></div>
+      </div>
+    </div>
+    <div id="wrapper">
+      <div id="nav"></div>
+
+      <div id="div-gpt-ad-1639638001114-0"></div>
+      <div id="lcol">
+        <div id="doc">
+          <h1>Text to Speech</h1>
+          <form id="calcform">
+            <div id="topbar" class="btn-group">
+              <button
+                type="button"
+                onclick="SpeechForm.open()"
+                title="Open"
+                aria-label="Upload File"
+                class="btn btn-dark"
+              >
+                <img
+                  src="icons8-file-24.png"
+                  loading="lazy"
+                  width="24"
+                  height="24"
+                  alt
+                /><span> Upload File(.txt only)</span>
+              </button>
+              <button
+                type="button"
+                onclick="SpeechForm.copy()"
+                title="Copy"
+                class="btn btn-dark"
+              >
+                <img
+                  src="icons8-copy-32.png"
+                  loading="lazy"
+                  width="24"
+                  height="24"
+                  alt
+                />
+              </button>
+              <button
+                type="button"
+                onclick="SpeechForm.selectall()"
+                title="Select All"
+                class="btn btn-dark"
+              >
+                <img
+                  src="icons8-select-all-50.png"
+                  loading="lazy"
+                  width="24"
+                  height="24"
+                  alt
+                />
+              </button>
+              <button
+                type="button"
+                onclick="SpeechForm.zoomin()"
+                title="Zoom In"
+                class="btn btn-dark"
+              >
+                <img
+                  src=" icons8-zoom-in-50.png"
+                  loading="lazy"
+                  width="24"
+                  height="24"
+                  alt
+                />
+              </button>
+              <button
+                type="button"
+                onclick="SpeechForm.zoomout()"
+                title="Zoom Out"
+                class="btn btn-dark"
+              >
+                <img
+                  src=" icons8-zoom-out-50.png"
+                  loading="lazy"
+                  width="24"
+                  height="24"
+                  alt
+                />
+              </button>
+              <input
+                type="file"
+                id="fileElem"
+                name="fileElem[]"
+                multiple
+                style="visibility: hidden; width: 30px"
+                onchange="SpeechForm.onfile()"
+              />
+            </div>
+
+            <textarea rows="10" id="area" class="form-control" autofocus>
+            </textarea>
+
+            <input type="range" min="0" value="0" id="playslide" />
+            <div id="bar">
+              <div class="btn-group" role="group" aria-label="Basic example">
+                <button
+                  type="button"
+                  onclick="SpeechForm.playbtn()"
+                  class="btn btn-dark"
+                  id="play"
+                  title="Play"
+                  disabled
+                >
+                  <img
+                    src="icons8-play-30.png"
+                    loading="lazy"
+                    width="24"
+                    height="24"
+                    alt
+                  />
+                </button>
+                <button
+                  type="button"
+                  onclick="SpeechForm.playprev()"
+                  class="btn btn-dark"
+                  id="prev"
+                  title="Prev"
+                  disabled
+                >
+                  <img
+                    src="icons8-previous-50.png"
+                    loading="lazy"
+                    width="24"
+                    height="24"
+                    alt
+                  />
+                </button>
+                <button
+                  type="button"
+                  onclick="SpeechForm.playnext()"
+                  class="btn btn-dark"
+                  id="next"
+                  title="Next"
+                  disabled
+                >
+                  <img
+                    src="icons8-last-30.png"
+                    loading="lazy"
+                    width="24"
+                    height="24"
+                    alt
+                  />
+                </button>
+                <button
+                  type="button"
+                  onclick="SpeechForm.stopbtn()"
+                  class="btn btn-dark"
+                  title="Stop"
+                >
+                  <img
+                    src="icons8-stop-50 (1).png"
+                    loading="lazy"
+                    width="24"
+                    height="24"
+                    alt
+                  />
+                </button>
+               
+                </button>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  step="any"
+                  id="volslide"
+                />
+                 <button
+                  type="button"
+                  id="full"
+                  title="Fullscreen"
+                  onclick="SpeechForm.OnFullscreen()"
+                  class="btn btn-dark"
+                >
+                  <img
+                    src="expand.png"
+                    loading="lazy"
+                    width="24"
+                    height="24"
+                    alt
+                  />
+                </button>
+              </div>
+            </div>
+            <select
+              id="voiceselect"
+              onchange="SpeechForm.voicechange()"
+              class="form-control mt-3"
+            ></select>
+          </form>
+          <br />
+
+          <hr />
+
+          <div id="adngin-bottom_01-0"></div>
+        </div>
+       
+      </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script>
+      "use strict";
+      var isfullscreen = false;
+      var area, txt;
+      var fontsize = 18;
+      var s = { INIT: 1, PLAY: 2, PAUSED: 3, END: 4 };
+      var iplay,
+        previplay,
+        playstate = s.INIT;
+      var start, end;
+      var msg = null;
+      var imsg;
+      var voices = [];
+      var voiceindex = 3;
+      var volume;
+      var playslidemax;
+      var firstinit = true;
+      const fullElem = document.getElementById("full");
+      const playElem = document.getElementById("play");
+      const areaElem = document.getElementById("area");
+      const calcform = document.getElementById("calcform");
+      const rcol = document.getElementById("rcol");
+      $(document).ready(function () {
+        try {
+          eval('"use strict"; class foo {}');
+        } catch (e) {
+          alert(
+            "Speech synthesis is not supported in this browser!\nPlease use Chrome browser."
+          );
+        }
+        SpeechSynth.init();
+        SpeechForm.init();
+      });
+
+      class SpeechForm {
+        static init() {
+          playstate = s.INIT;
+          $("#play").prop("disabled", false);
+          $("#prev").prop("disabled", false);
+          $("#next").prop("disabled", false);
+          txt = areaElem.value;
+          txt = txt.replace(/\t/g, "");
+          areaElem.value = txt;
+          $("#bar").mouseleave(function () {
+            SpeechForm.volhide();
+          });
+          $("#volbtn").hover(function () {
+            SpeechForm.volshow();
+          });
+          $(window).on("unload blur", function () {
+            SpeechForm.localSave();
+          });
+          $("#area").on("paste", function () {
+            setTimeout(function () {
+              SpeechForm.init();
+            }, 500);
+          });
+          $("#playslide").on("change input", function () {
+            SpeechForm.onSlideChange();
+          });
+          $("#volslide").on("change input", function () {
+            SpeechForm.onVolSlideChange();
+          });
+          SpeechForm.populateVoiceList();
+          if (firstinit == true) {
+            firstinit = false;
+            $("#volslide").val(100);
+            SpeechForm.localLoad();
+          }
+          SpeechForm.initText();
+          SpeechForm.setslider(0);
+          SpeechForm.initslider();
+        }
+        static localLoad() {
+          if (typeof Storage !== "undefined") {
+            var txt = localStorage.getItem("texttospeech_text");
+            if (txt != null && txt != "") areaElem.value = txt;
+          }
+        }
+        static localSave() {
+          if (typeof Storage !== "undefined") {
+            var txt = areaElem.value;
+            localStorage.setItem("texttospeech_text", txt);
+          }
+        }
+        static onPlaySlideChange() {
+          var v = $("#playslide").val();
+        }
+        static onVolSlideChange() {
+          var v = $("#volslide").val() / 100.0;
+          volume = v;
+        }
+        static populateVoiceList() {
+          var voices = SpeechSynth.getvoices();
+          if (voices == null || voices.length == 0) return;
+          if (voices.length > 21) voices.length = 21;
+          for (var i = 0; i < voices.length; i++) {
+            var textContent = voices[i].name + " (" + voices[i].lang + ")";
+            if (textContent.substring(0, 6) == "Google")
+              textContent = textContent.substring(7, textContent.length);
+            if (textContent.substring(0, 9) == "Microsoft")
+              textContent = textContent.substring(10, textContent.length);
+            $("#voiceselect").append("<option>" + textContent + "</option>");
+          }
+          var lang = window.navigator.userLanguage || window.navigator.language;
+          var found = false;
+          for (var i = 0; i < voices.length; i++)
+            if (voices[i].lang == lang) {
+              i++;
+              found = true;
+              break;
+            }
+          if (found == false) i = 1;
+          if (i == 2 && voices.length > 6 && voices[i].lang == "en-US") i = 6;
+          $("#voiceselect option:nth-child(" + i + ")").prop("selected", true);
+          SpeechSynth.setvoice(i - 1);
+        }
+        static initText() {
+          txt = areaElem.value;
+          txt = txt.replace(/[.?!:,\r\n\]]/g, ".");
+          txt = txt.replace(/\.\.+/g, ".");
+          txt = txt.replace(/\.\s*/g, "|");
+          txt = txt.split("|");
+          txt = txt.filter((n) => n);
+          playslidemax = txt.length - 1;
+        }
+        static initslider() {
+          $("#playslide").prop("max", playslidemax);
+        }
+        static getslider() {
+          return $("#playslide").val();
+        }
+        static setslider(v) {
+          $("#playslide").val(v);
+        }
+        static volshow() {
+          $("#volslide").css("display", "block");
+        }
+        static volhide() {
+          $("#volslide").css("display", "none");
+        }
+        static FullscreenReq() {
+          if (calcform.requestFullscreen) calcform.requestFullscreen();
+          else if (calcform.mozRequestFullScreen)
+            calcform.mozRequestFullScreen();
+          else if (calcform.webkitRequestFullscreen)
+            calcform.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+          else if (calcform.msRequestFullscreen) calcform.msRequestFullscreen();
+        }
+        static OnFullscreen() {
+          if (!isfullscreen) {
+            console.log("enter");
+            isfullscreen = true;
+            fullElem.children[0].src =
+              "expand.png";
+            SpeechForm.FullscreenReq();
+            calcform.style.setProperty("height", "100vh");
+            areaElem.style.setProperty("height", "70vh");
+            setTimeout(function () {
+              document.addEventListener(
+                "fullscreenchange",
+                SpeechForm.OnFullscreen
+              );
+            }, 1000);
+          } else {
+            console.log("exit");
+            isfullscreen = false;
+            fullElem.children[0].src =
+              "expand.png";
+            document.exitFullscreen();
+            calcform.style.setProperty("height", "unset");
+            areaElem.style.setProperty("height", "unset");
+            document.removeEventListener(
+              "fullscreenchange",
+              SpeechForm.OnFullscreen
+            );
+          }
+        }
+        static open() {
+          $("#fileElem").click();
+        }
+        static onfile() {
+          var file = document.getElementById("fileElem").files[0];
+          document.getElementById("fileElem").value = "";
+          SpeechForm.fileLoad(file);
+        }
+        static fileLoad(file) {
+          var reader = new FileReader();
+          reader.onloadend = function (e) {
+            if (e.target.readyState == FileReader.DONE) {
+              var t = e.target.result;
+
+              areaElem.value = t;
+              areaElem.focus();
+              OnCount();
+              SpeechForm.init();
+            }
+          };
+          reader.readAsText(file, "UTF-8");
+          //SpeechForm.setslider(0);
+         }
+        static copy() {
+          areaElem.select();
+          document.execCommand("copy");
+        }
+        static zoomout() {
+          fontsize /= 1.1;
+          var size = Math.round(fontsize) + "px";
+          $("#area").css("font-size", size);
+        }
+        static zoomin() {
+          fontsize *= 1.1;
+          var size = Math.round(fontsize) + "px";
+          $("#area").css("font-size", size);
+        }
+        static voicechange() {
+          var i = $("#voiceselect")[0].selectedIndex;
+          SpeechSynth.setvoice(i);
+        }
+
+        static selectall() {
+          $("#area").focus();
+          $("#area").select();
+        }
+        static resetform() {
+          SpeechSynth.stop();
+          areaElem.value = "";
+          areaElem.focus();
+        }
+        static stopbtn() {
+          SpeechForm.setslider(0);
+          SpeechSynth.stop();
+          if (playstate == s.INIT) {
+            playstate = s.END;
+            SpeechForm.playmng();
+          } else playstate = s.END;
+        }
+        static setselect() {
+          areaElem.selectionStart = start;
+          areaElem.selectionEnd = start;
+          areaElem.blur();
+          areaElem.focus();
+          areaElem.selectionStart = start;
+          areaElem.selectionEnd = end;
+          areaElem.focus();
+        }
+        static playbtn() {
+          if (playstate == s.END) playstate = s.INIT;
+
+          if (playstate == s.INIT) {
+            SpeechForm.initText();
+            areaElem.inputMode = "none";
+
+            playElem.children[0].src ="./icons8-pause-30.png";
+            SpeechForm.playmng();
+          } else if (playstate == s.PLAY) {
+            areaElem.inputMode = "text";
+            playElem.children[0].src =
+              "./icons8-play-30.png";
+            playstate = s.PAUSED;
+            SpeechSynth.stop();
+            SpeechForm.setselect();
+          } else if (playstate == s.PAUSED) {
+            playElem.children[0].src =
+              "./icons8-pause-30.png";
+            playstate = s.PLAY;
+            iplay--;
+            SpeechForm.playmng();
+            SpeechForm.setselect();
+          }
+        }
+        static playnext() {
+          if (playstate == s.PLAY) {
+            SpeechSynth.stop();
+            //if( ++iplay==txt.length )
+            if (iplay == txt.length) playstate = s.END;
+            previplay = -1;
+            //SpeechForm.playmng();
+          }
+        }
+        static playprev() {
+          if (playstate == s.PLAY) {
+            if (iplay < 1) return;
+            SpeechSynth.stop();
+            if (iplay == 1) iplay = 0;
+            else iplay -= 2;
+            if (iplay < 0) iplay = 0;
+            //playstate = s.INIT;
+            previplay = -1;
+            //SpeechForm.playmng();
+          }
+        }
+        static playmng() {
+          switch (playstate) {
+            case s.INIT:
+              SpeechSynth.stop();
+              area = areaElem.value;
+              if (area == "") {
+                //$("#play").html("<i class='material-icons'>play_arrow</i>");
+                playElem.children[0].src =
+                  "./icons8-play-30.png";
+                return;
+              }
+              //txt=area.replace(/([.?!:,\r\n])\s*/g, "$1|").split("|");
+              //txt=txt.replace(/[\"\'\’\‘]/gi, "");
+              //console.log(txt);
+              if (txt == null || txt.length == 0) {
+                //$("#play").html("<i class='material-icons'>play_arrow</i>");
+                playElem.children[0].src =
+                  "./icons8-play-30.png";
+                return;
+              }
+              iplay = start = end = 0;
+              previplay = -1;
+              playstate = s.PLAY;
+            case s.PLAY:
+              //console.log(iplay);
+              var t = txt[iplay].replace(/[\"\'\’\‘]/gi, "");
+              if (t != "") {
+                SpeechSynth.play(t);
+                if (previplay != iplay) {
+                  previplay = iplay;
+                  //start = area.indexOf(txt[iplay],end);
+                  start = area.indexOf(txt[iplay], 0);
+                  end = start + txt[iplay].length;
+                }
+                SpeechForm.setselect();
+                SpeechForm.setslider(iplay);
+              }
+              if (++iplay == txt.length) {
+                playstate = s.END;
+                areaElem.inputMode = "text";
+              }
+              break;
+            case s.PAUSED:
+              //SpeechSynth.resume();
+              //playstate = s.PLAY;
+              break;
+            case s.END:
+              //$("#play").html("<i class='material-icons'>play_arrow</i>");
+              playElem.children[0].src =
+                "./icons8-play-30.png";
+              areaElem.blur();
+              playstate = s.INIT;
+              break;
+            default:
+              console.log("Bad playstate!!!");
+          }
+        }
+      }
+
+      class SpeechSynth {
+        static init() {
+          if (!("speechSynthesis" in window)) {
+            alert(
+              "Speech synthesis is not supported in this browser!\nPlease use Chrome browser."
+            );
+            return;
+          }
+          SpeechSynth.stop();
+          voices = window.speechSynthesis.getVoices();
+
+          volume = 1.0;
+
+          if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = function () {
+              //console.log("onvoiceschanged()");
+              if (voices.length > 0) return;
+              voices = window.speechSynthesis.getVoices();
+              SpeechForm.populateVoiceList();
+            };
+          }
+        }
+        static getvoices() {
+          return voices;
+        }
+        static setvoice(i) {
+          voiceindex = i;
+        }
+
+        static ispending() {
+          return window.speechSynthesis.pending;
+        }
+        static stop() {
+          window.speechSynthesis.cancel();
+        }
+        static pause() {
+          window.speechSynthesis.pause();
+        }
+
+
+        static resume() {
+          window.speechSynthesis.resume();
+        }
+        static play(s) {
+          //voices = window.speechSynthesis.getVoices();
+          if (voices.length == 0)
+            alert(
+              "No voices detected. Please restart the browser and try again."
+            );
+          msg = new SpeechSynthesisUtterance();
+          msg.onend = function (e) {
+            //console.log('Finished in ' + e.elapsedTime + ' seconds.');
+            SpeechForm.playmng();
+          };
+          msg.onerror = function (e) {
+            console.log("Error in " + e.elapsedTime + " seconds.");
+            SpeechForm.playmng();
+          };
+          msg.voice = voices[voiceindex];
+          //msg.voiceURI = 'native';
+          msg.volume = volume; // 0 to 1
+          msg.rate = 1.0; // 0.1 to 10
+          msg.pitch = 0; //0 to 2
+          msg.text = s;
+          //msg.lang = '';
+          //msg.lang = 'en-US'; //!!!
+          msg.lang = voices[voiceindex].lang; //!!!
+          //console.log(msg);
+          window.speechSynthesis.speak(msg);
+          //setTimeout(function() { window.speechSynthesis.speak(msg); }, 0);
+          if (++imsg == 2) imsg = 0;
+        }
+      }
+    </script>
+  </body>
+</html>
