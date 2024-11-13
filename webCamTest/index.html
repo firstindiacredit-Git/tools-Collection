@@ -532,9 +532,24 @@ align-items: center;
       })
       .catch(function(err) {
          console.log(err.name + ": " + err.message);
-         if( get_browser()=="Chrome" ) {
-            alertElem.style.display = "block";
-         }
+         function get_browser() {
+            const userAgent = navigator.userAgent;
+            if (userAgent.includes("Chrome")) {
+                return "Chrome";
+            } else if (userAgent.includes("Edge")) {
+                return "Edge";
+            } else if (userAgent.includes("Safari") && !userAgent.includes("Chrome")) {
+        return "Safari";
+    } else {
+        return "Other";
+    }
+}
+
+// Usage:
+if (get_browser() == "Chrome") {
+    alertElem.style.display = "block";
+}
+
       });
    }
    function stopAudio()
